@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
 import { getAllMatchPairs } from "@/lib/matches";
@@ -19,10 +19,24 @@ function HomeContent() {
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [myGames, setMyGames] = useState<GameRow[]>([]);
 
   useEffect(() => {
     if (searchParams.get("mode") === "challenge") setMode("vs-friend");
   }, [searchParams]);
+
+  useEffect(() => {
+    const uuid = getOrCreateUUID();
+    if (!uuid) return;
+    supabase
+      .from("games")
+      .select("id, player1_name, player2_name, player1_answers, player2_answers, player1_uuid, player2_uuid")
+      .eq("phase", "finished")
+      .or(`player1_uuid.eq.${uuid},player2_uuid.eq.${uuid}`)
+      .order("created_at", { ascending: false })
+      .limit(5)
+      .then(({ data }) => { if (data) setMyGames(data as GameRow[]); });
+  }, []);
 
   async function handleCreateGame() {
     if (!name.trim()) {
@@ -52,6 +66,22 @@ function HomeContent() {
       setCreating(false);
     }
   }
+
+  const uuid = typeof localStorage !== "undefined" ? localStorage.getItem("wpf-uuid") ?? "" : "";
+  const record = myGames.reduce(
+    (acc, g) => {
+      const iP1 = g.player1_uuid === uuid;
+      const my = iP1 ? g.player1_answers : g.player2_answers;
+      const opp = iP1 ? g.player2_answers : g.player1_answers;
+      const ms = my.filter(Boolean).length;
+      const os = opp.filter(Boolean).length;
+      if (ms > os) acc.w++;
+      else if (ms < os) acc.l++;
+      else acc.d++;
+      return acc;
+    },
+    { w: 0, l: 0, d: 0 }
+  );
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -110,6 +140,29 @@ function HomeContent() {
             </button>
           ))}
         </div>
+
+        {myGames.length > 0 && (
+          <div style={{ width: "100%", maxWidth: 340, fontSize: 8, color: "var(--text-dim)" }}>
+            <div style={{ color: "var(--gold)", marginBottom: 10, fontSize: 9 }}>
+              YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
+            </div>
+            {myGames.map((g) => {
+              const iP1 = g.player1_uuid === uuid;
+              const myName = iP1 ? g.player1_name : g.player2_name;
+              const oppName = iP1 ? g.player2_name : g.player1_name;
+              const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
+              const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
+              const result = my > opp ? "W" : my < opp ? "L" : "D";
+              const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
+              return (
+                <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
+                  <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
+                  <span style={{ color }}>{result} {my}–{opp}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Single player */}
         {mode === "single" && (
