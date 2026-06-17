@@ -73,10 +73,12 @@ function HomeContent() {
   const [pickedOpponent, setPickedOpponent] = useState("");
 
   const allPairs = getAllMatchPairs();
+  const countryGroup: Record<string, string> = {};
+  allPairs.forEach((p) => { countryGroup[p.home] = p.group; countryGroup[p.away] = p.group; });
   const allCountries = Array.from(new Set(allPairs.flatMap((p) => [p.home, p.away]))).sort();
   const opponents = pickedCountry
     ? allPairs.filter((p) => p.home === pickedCountry || p.away === pickedCountry)
-        .map((p) => (p.home === pickedCountry ? { country: p.away, group: p.group, home: p.home, away: p.away } : { country: p.home, group: p.group, home: p.home, away: p.away }))
+        .map((p) => (p.home === pickedCountry ? { country: p.away, home: p.home, away: p.away } : { country: p.home, home: p.home, away: p.away }))
     : [];
 
   function getMatchPairs() {
@@ -254,27 +256,30 @@ function HomeContent() {
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 320 }}>
-            <label style={{ fontSize: 8, color: "var(--text-dim)" }}>PICK A MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text-dim)" }}>PICK A COUNTRY</label>
             <select
               value={pickedCountry}
               onChange={(e) => { setPickedCountry(e.target.value); setPickedOpponent(""); }}
               style={{ fontFamily: "var(--font-press-start), monospace", fontSize: 8, padding: "8px 10px", background: "#0a0e14", border: "2px solid var(--panel-border)", color: "var(--text)", borderRadius: 4, width: "100%", cursor: "pointer" }}
             >
               <option value="">RANDOM</option>
-              {allCountries.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+              {allCountries.map((c) => <option key={c} value={c}>{c.toUpperCase()} · GROUP {countryGroup[c]}</option>)}
             </select>
             {opponents.length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
-                {opponents.map(({ country, group }) => (
-                  <button
-                    key={country}
-                    onClick={() => setPickedOpponent(pickedOpponent === country ? "" : country)}
-                    style={{ fontSize: 7, padding: "7px 10px", background: pickedOpponent === country ? "var(--gold)" : "var(--panel)", color: pickedOpponent === country ? "#000" : "var(--text-dim)", border: `2px solid ${pickedOpponent === country ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer", whiteSpace: "nowrap" }}
-                  >
-                    vs {country.toUpperCase()} · GRP {group}
-                  </button>
-                ))}
-              </div>
+              <>
+                <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 4 }}>PICK A MATCH</label>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                  {opponents.map(({ country }) => (
+                    <button
+                      key={country}
+                      onClick={() => setPickedOpponent(pickedOpponent === country ? "" : country)}
+                      style={{ fontSize: 7, padding: "7px 10px", background: pickedOpponent === country ? "var(--gold)" : "var(--panel)", color: pickedOpponent === country ? "#000" : "var(--text-dim)", border: `2px solid ${pickedOpponent === country ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer", whiteSpace: "nowrap" }}
+                    >
+                      {country.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
