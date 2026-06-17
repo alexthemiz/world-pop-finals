@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { Suspense, useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
@@ -11,7 +11,7 @@ function makeGameId(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"single" | "vs-friend">("single");
@@ -157,6 +157,14 @@ export default function Home() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }
 
