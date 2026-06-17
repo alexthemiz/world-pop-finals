@@ -23,10 +23,9 @@ const FLAG_CODES = [
 
 function FlagTicker({ direction }: { direction: "left" | "right" }) {
   const animName = direction === "left" ? "wpf-scroll-left" : "wpf-scroll-right";
-  // Duplicate for seamless loop
   const items = [...FLAG_CODES, ...FLAG_CODES];
   return (
-    <div style={{ overflow: "hidden", width: "100%", background: "rgba(0,0,0,0.55)", borderTop: direction === "right" ? "1px solid rgba(255,255,255,0.07)" : undefined, borderBottom: direction === "left" ? "1px solid rgba(255,255,255,0.07)" : undefined, padding: "5px 0" }}>
+    <div style={{ position: "fixed", left: 0, right: 0, zIndex: 10, overflow: "hidden", background: "rgba(0,0,0,0.7)", borderTop: "1px solid rgba(255,255,255,0.07)", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "5px 0", ...(direction === "left" ? { top: 0 } : { bottom: 0 }) }}>
       <div style={{ display: "inline-flex", alignItems: "center", gap: 12, animation: `${animName} 40s linear infinite`, paddingRight: 12 }}>
         {items.map((code, i) => (
           // eslint-disable-next-line @next/next/no-img-element
@@ -148,9 +147,10 @@ function HomeContent() {
 
       <PitchBackground />
 
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
-        <FlagTicker direction="left" />
+      <FlagTicker direction="left" />
+      <FlagTicker direction="right" />
 
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
         <main
           style={{
             flex: 1,
@@ -158,7 +158,9 @@ function HomeContent() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: 24,
+            padding: "24px 24px",
+            paddingTop: 58,
+            paddingBottom: 58,
             gap: 28,
             textAlign: "center",
           }}
@@ -278,7 +280,6 @@ function HomeContent() {
           )}
         </main>
 
-        <FlagTicker direction="right" />
         <Footer />
       </div>
     </>
