@@ -12,6 +12,48 @@ function makeGameId(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
+// All 48 WC 2026 nations as flag emojis
+const FLAGS =
+  "🇺🇸 🇲🇽 🇨🇦 🇧🇷 🇦🇷 🇫🇷 🇩🇪 🇪🇸 🇵🇹 🇳🇱 🇧🇪 🏴󠁧󠁢󠁥󠁮󠁧󠁿 🇮🇹 🇭🇷 🇵🇱 🇨🇭 🇺🇦 🇦🇹 🇷🇴 🇭🇺 🇸🇮 🇦🇱 🇬🇪 🇸🇰 🇨🇿 🏴󠁧󠁢󠁳󠁣󠁴󠁿 🇹🇷 🇰🇿 🇲🇦 🇸🇳 🇳🇬 🇨🇲 🇪🇬 🇿🇦 🇨🇮 🇹🇳 🇲🇱 🇨🇩 🇯🇵 🇰🇷 🇦🇺 🇸🇦 🇮🇷 🇮🇩 🇨🇳 🇳🇿 🇺🇾 🇨🇴 🇪🇨 🇧🇴 🇨🇱 🇵🇾 🇻🇪";
+
+const TICKER = `${FLAGS}   ${FLAGS}   `;
+
+function FlagTicker({ direction }: { direction: "left" | "right" }) {
+  const animName = direction === "left" ? "wpf-scroll-left" : "wpf-scroll-right";
+  return (
+    <div style={{ overflow: "hidden", width: "100%", background: "rgba(0,0,0,0.55)", borderTop: direction === "right" ? "1px solid rgba(255,255,255,0.07)" : undefined, borderBottom: direction === "left" ? "1px solid rgba(255,255,255,0.07)" : undefined, padding: "6px 0" }}>
+      <div style={{ display: "inline-block", whiteSpace: "nowrap", animation: `${animName} 40s linear infinite`, fontSize: 20, letterSpacing: 4 }}>
+        {TICKER}
+      </div>
+    </div>
+  );
+}
+
+function PitchBackground() {
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 0, overflow: "hidden", pointerEvents: "none" }}>
+      {/* Grass stripes */}
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} style={{ position: "absolute", top: 0, bottom: 0, left: `${i * 10}%`, width: "10%", background: i % 2 === 0 ? "#1a3d1a" : "#1e4a1e" }} />
+      ))}
+      {/* Pitch outline */}
+      <div style={{ position: "absolute", top: "8%", bottom: "8%", left: "5%", right: "5%", border: "2px solid rgba(255,255,255,0.12)", borderRadius: 2 }} />
+      {/* Halfway line */}
+      <div style={{ position: "absolute", top: "8%", bottom: "8%", left: "50%", width: 2, background: "rgba(255,255,255,0.12)", transform: "translateX(-50%)" }} />
+      {/* Center circle */}
+      <div style={{ position: "absolute", top: "50%", left: "50%", width: 140, height: 140, border: "2px solid rgba(255,255,255,0.12)", borderRadius: "50%", transform: "translate(-50%, -50%)" }} />
+      {/* Center spot */}
+      <div style={{ position: "absolute", top: "50%", left: "50%", width: 6, height: 6, background: "rgba(255,255,255,0.2)", borderRadius: "50%", transform: "translate(-50%, -50%)" }} />
+      {/* Left penalty box */}
+      <div style={{ position: "absolute", top: "30%", bottom: "30%", left: "5%", width: "14%", border: "2px solid rgba(255,255,255,0.09)", borderLeft: "none" }} />
+      {/* Right penalty box */}
+      <div style={{ position: "absolute", top: "30%", bottom: "30%", right: "5%", width: "14%", border: "2px solid rgba(255,255,255,0.09)", borderRight: "none" }} />
+      {/* Dark vignette overlay so content stays readable */}
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center, rgba(10,14,20,0.55) 0%, rgba(10,14,20,0.82) 100%)" }} />
+    </div>
+  );
+}
+
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -84,134 +126,154 @@ function HomeContent() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 24,
-          gap: 28,
-          textAlign: "center",
-        }}
-      >
-        <div>
-          <h1
-            style={{
-              fontSize: "clamp(20px, 5vw, 32px)",
-              color: "var(--gold)",
-              margin: 0,
-              lineHeight: 1.6,
-            }}
-          >
-            WORLD POP FINALS
-          </h1>
-          <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
-            COUNTRY TRIVIA SHOOTOUT
-          </p>
-        </div>
+    <>
+      <style>{`
+        @keyframes wpf-scroll-left {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes wpf-scroll-right {
+          0%   { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
 
-        {/* Mode toggle */}
-        <div
+      <PitchBackground />
+
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
+        <FlagTicker direction="left" />
+
+        <main
           style={{
+            flex: 1,
             display: "flex",
-            background: "var(--panel)",
-            border: "3px solid var(--panel-border)",
-            borderRadius: 6,
-            overflow: "hidden",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            gap: 28,
+            textAlign: "center",
           }}
         >
-          {(["single", "vs-friend"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => { setMode(m); setError(null); }}
+          <div>
+            <h1
               style={{
-                fontSize: 9,
-                padding: "12px 20px",
-                background: mode === m ? "var(--gold)" : "transparent",
-                color: mode === m ? "#000" : "var(--text-dim)",
-                border: "none",
-                cursor: "pointer",
+                fontSize: "clamp(20px, 5vw, 32px)",
+                color: "var(--gold)",
+                margin: 0,
+                lineHeight: 1.6,
+                textShadow: "0 0 20px rgba(255,200,0,0.4)",
               }}
             >
-              {m === "single" ? "SINGLE PLAYER" : "CHALLENGE"}
-            </button>
-          ))}
-        </div>
-
-        {myGames.length > 0 && (
-          <div style={{ width: "100%", maxWidth: 340, fontSize: 8, color: "var(--text-dim)" }}>
-            <div style={{ color: "var(--gold)", marginBottom: 10, fontSize: 9 }}>
-              YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
-            </div>
-            {myGames.map((g) => {
-              const iP1 = g.player1_uuid === uuid;
-              const myName = iP1 ? g.player1_name : g.player2_name;
-              const oppName = iP1 ? g.player2_name : g.player1_name;
-              const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
-              const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
-              const result = my > opp ? "W" : my < opp ? "L" : "D";
-              const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
-              return (
-                <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
-                  <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
-                  <span style={{ color }}>{result} {my}–{opp}</span>
-                </div>
-              );
-            })}
+              WORLD POP FINALS
+            </h1>
+            <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
+              COUNTRY TRIVIA SHOOTOUT
+            </p>
           </div>
-        )}
 
-        {/* Single player */}
-        {mode === "single" && (
-          <button onClick={() => router.push("/single")} style={ctaButtonStyle}>
-            PLAY
-          </button>
-        )}
-
-        {/* VS Friend */}
-        {mode === "vs-friend" && (
+          {/* Mode toggle */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: 14,
-              width: 280,
               background: "var(--panel)",
               border: "3px solid var(--panel-border)",
               borderRadius: 6,
-              padding: 20,
+              overflow: "hidden",
             }}
           >
-            <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "left" }}>
-              YOUR NAME
-            </label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="PLAYER 1"
-              maxLength={16}
-              style={{
-                fontFamily: "var(--font-press-start), monospace",
-                fontSize: 10,
-                padding: 10,
-                background: "#0a0e14",
-                border: "2px solid var(--panel-border)",
-                color: "var(--text)",
-                borderRadius: 4,
-              }}
-            />
-            {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
-            <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
-              {creating ? "CREATING..." : "CREATE GAME"}
-            </button>
+            {(["single", "vs-friend"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setError(null); }}
+                style={{
+                  fontSize: 9,
+                  padding: "12px 20px",
+                  background: mode === m ? "var(--gold)" : "transparent",
+                  color: mode === m ? "#000" : "var(--text-dim)",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {m === "single" ? "SINGLE PLAYER" : "CHALLENGE"}
+              </button>
+            ))}
           </div>
-        )}
-      </main>
-      <Footer />
-    </div>
+
+          {myGames.length > 0 && (
+            <div style={{ width: "100%", maxWidth: 340, fontSize: 8, color: "var(--text-dim)" }}>
+              <div style={{ color: "var(--gold)", marginBottom: 10, fontSize: 9 }}>
+                YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
+              </div>
+              {myGames.map((g) => {
+                const iP1 = g.player1_uuid === uuid;
+                const myName = iP1 ? g.player1_name : g.player2_name;
+                const oppName = iP1 ? g.player2_name : g.player1_name;
+                const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
+                const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
+                const result = my > opp ? "W" : my < opp ? "L" : "D";
+                const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
+                return (
+                  <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
+                    <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
+                    <span style={{ color }}>{result} {my}–{opp}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Single player */}
+          {mode === "single" && (
+            <button onClick={() => router.push("/single")} style={ctaButtonStyle}>
+              PLAY
+            </button>
+          )}
+
+          {/* VS Friend */}
+          {mode === "vs-friend" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                width: 280,
+                background: "var(--panel)",
+                border: "3px solid var(--panel-border)",
+                borderRadius: 6,
+                padding: 20,
+              }}
+            >
+              <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "left" }}>
+                YOUR NAME
+              </label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="PLAYER 1"
+                maxLength={16}
+                style={{
+                  fontFamily: "var(--font-press-start), monospace",
+                  fontSize: 10,
+                  padding: 10,
+                  background: "#0a0e14",
+                  border: "2px solid var(--panel-border)",
+                  color: "var(--text)",
+                  borderRadius: 4,
+                }}
+              />
+              {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
+              <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
+                {creating ? "CREATING..." : "CREATE GAME"}
+              </button>
+            </div>
+          )}
+        </main>
+
+        <FlagTicker direction="right" />
+        <Footer />
+      </div>
+    </>
   );
 }
 
