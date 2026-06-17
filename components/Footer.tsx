@@ -13,7 +13,10 @@ export default function Footer() {
       <a href="https://www.alexmizrahi.com" target="_blank" rel="noreferrer">
         Alex
       </a>{" "}
-      using Claude
+      using Claude Code.{" "}
+      <a href="https://www.alexmizrahi.com" target="_blank" rel="noreferrer">
+        He&apos;s available for hire.
+      </a>
     </footer>
   );
 }

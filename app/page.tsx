@@ -203,7 +203,7 @@ function HomeContent() {
                   cursor: "pointer",
                 }}
               >
-                {m === "single" ? "SINGLE PLAYER" : "CHALLENGE"}
+                {m === "single" ? "SINGLE PLAYER" : "CHALLENGE MODE"}
               </button>
             ))}
           </div>
