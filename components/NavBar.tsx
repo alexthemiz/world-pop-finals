@@ -21,6 +21,15 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
   }
 
   return (
+    <>
+    <style>{`
+      .wpf-nav-full { display: inline; }
+      .wpf-nav-short { display: none; }
+      @media (max-width: 480px) {
+        .wpf-nav-full { display: none; }
+        .wpf-nav-short { display: inline; }
+      }
+    `}</style>
     <div
       style={{
         display: "flex",
@@ -33,8 +42,9 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
         minWidth: 0,
       }}
     >
-      <Link href="/" style={{ fontSize: "clamp(7px, 2vw, 9px)", color: "var(--gold)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
-        ◀ WPF
+      <Link href="/" style={{ fontSize: 9, color: "var(--gold)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
+        <span className="wpf-nav-full">◀ WORLD POP FINALS</span>
+        <span className="wpf-nav-short">◀ WPF</span>
       </Link>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -75,5 +85,6 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
         </button>
       </div>
     </div>
+    </>
   );
 }
