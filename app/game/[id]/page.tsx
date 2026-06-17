@@ -250,7 +250,22 @@ export default function GameRoom() {
   }
 
   if (slot === null) {
-    return <CenteredMessage>SPECTATING — OPEN ON YOUR OWN DEVICE TO PLAY</CenteredMessage>;
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <NavBar active="challenge" />
+        <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+            <div style={{ fontSize: 9, color: "var(--text-dim)" }}>THIS GAME IS ALREADY IN PROGRESS</div>
+            <div style={{ fontSize: 10, color: "var(--gold)" }}>START A NEW GAME</div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+              <button onClick={() => router.push("/single")} style={ctaButtonStyle}>SINGLE PLAYER</button>
+              <button onClick={() => router.push("/?mode=challenge")} style={ctaButtonStyle}>CHALLENGE MODE</button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   if (game.phase === "waiting") {
