@@ -39,9 +39,7 @@ function makeStatQuestion(match: MatchPair, qTypeIndex: number): Question {
   const winnerValue = winner === home ? homeValue : awayValue;
   const loserValue = loser === home ? homeValue : awayValue;
   return {
-    home,
-    away,
-    group,
+    home, away, group,
     questionType: "stat",
     questionText: qType.question,
     choiceA: home,
@@ -60,9 +58,7 @@ function makeDiasporaQuestion(match: MatchPair): Question | null {
   const bLabel = `${away} → ${home}`;
   const winnerLabel = diaspora.aInB >= diaspora.bInA ? aLabel : bLabel;
   return {
-    home,
-    away,
-    group,
+    home, away, group,
     questionType: "diaspora",
     questionText: `ARE THERE MORE PEOPLE FROM ${home.toUpperCase()} LIVING IN ${away.toUpperCase()}, OR FROM ${away.toUpperCase()} LIVING IN ${home.toUpperCase()}?`,
     choiceA: aLabel,
@@ -73,11 +69,8 @@ function makeDiasporaQuestion(match: MatchPair): Question | null {
   };
 }
 
-/**
- * Generates all available questions for a single match — one per stat type,
- * plus the diaspora question if data exists for this pair. Shuffled.
- */
-export function generateQuestionsForMatch(match: MatchPair): Question[] {
+/** All possible questions for a match, shuffled. */
+function allQuestionsForMatch(match: MatchPair): Question[] {
   const questions: Question[] = QUESTION_TYPES.map((_, i) => makeStatQuestion(match, i));
   const diaspora = makeDiasporaQuestion(match);
   if (diaspora) questions.push(diaspora);
@@ -85,22 +78,48 @@ export function generateQuestionsForMatch(match: MatchPair): Question[] {
 }
 
 /**
- * Picks one random match (excluding already-used pairs) and generates all
- * questions for it.
+ * Picks one random match and returns exactly 5 questions from it (shuffled
+ * stat types). Used for the main round of a multiplayer game or single player.
  */
 export function generateQuestions(
   matchList: MatchPair[],
   excludePairs: Set<string> = new Set()
 ): Question[] {
   const available = matchList.filter(
-    (m) =>
-      !excludePairs.has(`${m.home}|${m.away}`) &&
-      COUNTRIES[m.home] &&
-      COUNTRIES[m.away]
+    (m) => !excludePairs.has(`${m.home}|${m.away}`) && COUNTRIES[m.home] && COUNTRIES[m.away]
   );
   if (available.length === 0) return [];
   const match = available[Math.floor(Math.random() * available.length)];
-  return generateQuestionsForMatch(match);
+  return allQuestionsForMatch(match).slice(0, 5);
+}
+
+/**
+ * Generates a single sudden-death question. Tries to pick an unused question
+ * type from the existing match first; falls back to a new match if exhausted.
+ */
+export function generateSuddenDeathQuestion(
+  existing: Question[],
+  matchList: MatchPair[]
+): Question | null {
+  // Find which question texts have already been asked for this match pair.
+  const lastQ = existing[existing.length - 1];
+  const usedTexts = new Set(
+    existing.filter((q) => q.home === lastQ.home && q.away === lastQ.away).map((q) => q.questionText)
+  );
+
+  // Try to pick an unused type from the same match.
+  const sameMatch: MatchPair = { home: lastQ.home, away: lastQ.away, group: lastQ.group };
+  const remaining = allQuestionsForMatch(sameMatch).filter((q) => !usedTexts.has(q.questionText));
+  if (remaining.length > 0) return remaining[0];
+
+  // Fall back to a new match.
+  const usedPairs = new Set(existing.map((q) => `${q.home}|${q.away}`));
+  const available = matchList.filter(
+    (m) => !usedPairs.has(`${m.home}|${m.away}`) && COUNTRIES[m.home] && COUNTRIES[m.away]
+  );
+  if (available.length === 0) return null;
+  const newMatch = available[Math.floor(Math.random() * available.length)];
+  return allQuestionsForMatch(newMatch)[0];
 }
 
 export function usedPairKeys(questions: Question[]): Set<string> {

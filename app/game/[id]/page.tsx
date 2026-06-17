@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
-import { generateQuestions, usedPairKeys } from "@/lib/questions";
+import { generateQuestions, generateSuddenDeathQuestion } from "@/lib/questions";
 import { getAllMatchPairs } from "@/lib/matches";
 import { SOURCES } from "@/lib/countries";
 import Pitch from "@/components/Pitch";
@@ -73,29 +73,41 @@ export default function GameRoom() {
   }, [id]);
 
   const maybeAdvancePhase = useCallback(async (row: GameRow) => {
-    const totalNeeded = row.questions.length;
-    const p1Done = row.player1_answers.length >= totalNeeded;
-    const p2Done = row.player2_answers.length >= totalNeeded;
+    const total = row.questions.length;
+    const p1Done = row.player1_answers.length >= total;
+    const p2Done = row.player2_answers.length >= total;
     if (!p1Done || !p2Done) return;
 
     const p1Score = row.player1_answers.filter(Boolean).length;
     const p2Score = row.player2_answers.filter(Boolean).length;
 
-    if (p1Score === p2Score) {
-      const used = usedPairKeys(row.questions);
-      const newQuestions = generateQuestions(getAllMatchPairs(), used);
-      if (newQuestions.length === 0) {
+    // In sudden death, check if the last question broke the tie.
+    if (row.phase === "sudden_death") {
+      const lastP1 = row.player1_answers[total - 1];
+      const lastP2 = row.player2_answers[total - 1];
+      if (lastP1 !== lastP2) {
+        // One got it right, one didn't — game over.
         await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
         return;
       }
-      await supabase
-        .from("games")
-        .update({ questions: [...row.questions, ...newQuestions], round: row.round + 1, phase: "sudden_death" })
-        .eq("id", id)
-        .eq("phase", row.phase);
-    } else {
+      // Both right or both wrong — add one more question.
+    } else if (p1Score !== p2Score) {
+      // Main round: clear winner.
       await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
+      return;
     }
+
+    // Tied — add one sudden death question.
+    const newQ = generateSuddenDeathQuestion(row.questions, getAllMatchPairs());
+    if (!newQ) {
+      await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
+      return;
+    }
+    await supabase
+      .from("games")
+      .update({ questions: [...row.questions, newQ], round: row.round + 1, phase: "sudden_death" })
+      .eq("id", id)
+      .eq("phase", row.phase);
   }, [id]);
 
   async function handleJoin() {
