@@ -9,14 +9,11 @@ export default function Footer() {
         marginTop: "auto",
       }}
     >
-      Built by{" "}
+      Built with Claude Code by{" "}
       <a href="https://www.alexmizrahi.com" target="_blank" rel="noreferrer">
         Alex
-      </a>{" "}
-      using Claude Code.{" "}
-      <a href="https://www.alexmizrahi.com" target="_blank" rel="noreferrer">
-        He&apos;s available for hire.
       </a>
+      . Available for hire.
     </footer>
   );
 }
