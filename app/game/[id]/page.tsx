@@ -255,7 +255,7 @@ export default function GameRoom() {
         <NavBar active="challenge" />
         <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-            <div style={{ fontSize: 9, color: "var(--text-dim)" }}>THIS GAME IS ALREADY IN PROGRESS</div>
+            <div style={{ fontSize: 9, color: "var(--text-dim)" }}>{game.phase === "finished" ? "GAME OVER" : "THIS GAME IS ALREADY IN PROGRESS"}</div>
             <div style={{ fontSize: 10, color: "var(--gold)" }}>START A NEW GAME</div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               <button onClick={() => router.push("/single")} style={ctaButtonStyle}>SINGLE PLAYER</button>
