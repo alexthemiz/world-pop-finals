@@ -258,11 +258,27 @@ export default function GameRoom() {
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <NavBar active="challenge" />
         <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
-          <div>
-            <div style={{ fontSize: 12, color: "var(--gold)", marginBottom: 16 }}>WAITING FOR OPPONENT...</div>
-            <div style={{ fontSize: 8, color: "var(--text-dim)", marginBottom: 10 }}>SHARE THIS LINK:</div>
-            <div style={{ fontSize: 8, background: "var(--panel)", border: "2px solid var(--panel-border)", borderRadius: 6, padding: 12, wordBreak: "break-all", maxWidth: 360 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, maxWidth: 400, width: "100%" }}>
+            <div style={{ fontSize: 12, color: "var(--gold)" }}>WAITING FOR OPPONENT...</div>
+            <div style={{ fontSize: 8, color: "var(--text-dim)" }}>SHARE THIS LINK:</div>
+            <div style={{ fontSize: 8, background: "var(--panel)", border: "2px solid var(--panel-border)", borderRadius: 6, padding: 12, wordBreak: "break-all", width: "100%" }}>
               {pageUrl}
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => navigator.clipboard.writeText(pageUrl)}
+                style={ctaButtonStyle}
+              >
+                COPY LINK
+              </button>
+              {typeof navigator !== "undefined" && "share" in navigator && (
+                <button
+                  onClick={() => navigator.share({ title: "World Pop Finals", text: `Join my game on World Pop Finals!`, url: pageUrl })}
+                  style={ctaButtonStyle}
+                >
+                  SHARE
+                </button>
+              )}
             </div>
           </div>
         </main>
@@ -300,8 +316,21 @@ export default function GameRoom() {
               players={[{ name: myName, answers: myAnswers }, { name: oppName, answers: oppAnswers }]}
               totalQuestions={game.questions.length}
             />
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", margin: "20px 0" }}>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", margin: "20px 0", flexWrap: "wrap" }}>
               <button onClick={handlePlayAgain} style={ctaButtonStyle}>PLAY AGAIN</button>
+              <button
+                onClick={() => {
+                  const text = `${result} ${myName.toUpperCase()} ${myScore}–${oppScore} ${oppName.toUpperCase()} · World Pop Finals`;
+                  if ("share" in navigator) {
+                    (navigator as Navigator & { share: (d: object) => void }).share({ title: "World Pop Finals", text, url: window.location.href });
+                  } else {
+                    (navigator as Navigator).clipboard.writeText(text);
+                  }
+                }}
+                style={ctaButtonStyle}
+              >
+                SHARE
+              </button>
               <button onClick={() => router.push("/")} style={{ ...ctaButtonStyle, background: "transparent" }}>HOME</button>
             </div>
             <QuestionReview questions={game.questions} answers={myAnswers} questionStats={questionStats} />
