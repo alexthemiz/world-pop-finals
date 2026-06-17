@@ -12,6 +12,7 @@ export interface Question {
   winner: string;
   explanation: string;
   matchInfo: MatchInfo | null;
+  statKey: string;
 }
 
 interface MatchPair {
@@ -47,6 +48,7 @@ function makeStatQuestion(match: MatchPair, qTypeIndex: number): Question {
     winner,
     explanation: qType.explain(winner, loser, winnerValue, loserValue),
     matchInfo: getMatchInfo(home, away),
+    statKey: qType.key,
   };
 }
 
@@ -66,6 +68,7 @@ function makeDiasporaQuestion(match: MatchPair): Question | null {
     winner: winnerLabel,
     explanation: `${aLabel}: ${formatDiasporaCount(diaspora.aInB)} vs ${bLabel}: ${formatDiasporaCount(diaspora.bInA)}`,
     matchInfo: getMatchInfo(home, away),
+    statKey: "diaspora",
   };
 }
 

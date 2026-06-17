@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions, generateSuddenDeathQuestion } from "@/lib/questions";
+import { getOrCreateUUID } from "@/lib/uuid";
 import { getAllMatchPairs } from "@/lib/matches"; // still needed for generateQuestions on game create / play again
 import { SOURCES } from "@/lib/countries";
 import Pitch from "@/components/Pitch";
@@ -87,12 +88,32 @@ export default function GameRoom() {
       const lastP2 = row.player2_answers[total - 1];
       if (lastP1 !== lastP2) {
         // One got it right, one didn't — game over.
+        await Promise.all([
+          supabase.rpc("increment_question_stats", {
+            p_question_types: row.questions.map((q) => q.statKey),
+            p_correct_flags: row.player1_answers,
+          }),
+          supabase.rpc("increment_question_stats", {
+            p_question_types: row.questions.map((q) => q.statKey),
+            p_correct_flags: row.player2_answers,
+          }),
+        ]);
         await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
         return;
       }
       // Both right or both wrong — add one more question.
     } else if (p1Score !== p2Score) {
       // Main round: clear winner.
+      await Promise.all([
+        supabase.rpc("increment_question_stats", {
+          p_question_types: row.questions.map((q) => q.statKey),
+          p_correct_flags: row.player1_answers,
+        }),
+        supabase.rpc("increment_question_stats", {
+          p_question_types: row.questions.map((q) => q.statKey),
+          p_correct_flags: row.player2_answers,
+        }),
+      ]);
       await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
       return;
     }
@@ -100,6 +121,16 @@ export default function GameRoom() {
     // Tied — add one more question from the same match pair, or draw if exhausted.
     const newQ = generateSuddenDeathQuestion(row.questions);
     if (!newQ) {
+      await Promise.all([
+        supabase.rpc("increment_question_stats", {
+          p_question_types: row.questions.map((q) => q.statKey),
+          p_correct_flags: row.player1_answers,
+        }),
+        supabase.rpc("increment_question_stats", {
+          p_question_types: row.questions.map((q) => q.statKey),
+          p_correct_flags: row.player2_answers,
+        }),
+      ]);
       await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
       return;
     }
@@ -116,7 +147,7 @@ export default function GameRoom() {
     try {
       const { data, error } = await supabase
         .from("games")
-        .update({ player2_name: joinName.trim(), phase: "active" })
+        .update({ player2_name: joinName.trim(), player2_uuid: getOrCreateUUID(), phase: "active" })
         .eq("id", id)
         .is("player2_name", null)
         .select()

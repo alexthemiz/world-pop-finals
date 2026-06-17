@@ -15,4 +15,6 @@ export interface GameRow {
   phase: "waiting" | "active" | "sudden_death" | "finished";
   round: number;
   created_at: string;
+  player1_uuid: string | null;
+  player2_uuid: string | null;
 }

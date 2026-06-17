@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
+import { getOrCreateUUID } from "@/lib/uuid";
 import { getAllMatchPairs } from "@/lib/matches";
 import Footer from "@/components/Footer";
 
@@ -37,6 +38,7 @@ function HomeContent() {
         id,
         questions,
         player1_name: name.trim(),
+        player1_uuid: getOrCreateUUID(),
         phase: "waiting",
         round: 1,
       });

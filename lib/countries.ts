@@ -171,6 +171,7 @@ export function formatDiasporaCount(thousands: number): string {
 
 export interface QuestionType {
   id: string;
+  key: string;
   question: string;
   getValue: (country: string) => number;
   explain: (winner: string, loser: string, wv: number, lv: number) => string;
@@ -179,24 +180,28 @@ export interface QuestionType {
 export const QUESTION_TYPES: QuestionType[] = [
   {
     id: "pop",
+    key: "pop",
     question: "WHICH HAS THE LARGER POPULATION?",
     getValue: (c) => COUNTRIES[c].pop,
     explain: (w, l, wv, lv) => `${w}: ${(wv/1e6).toFixed(1)}M vs ${l}: ${(lv/1e6).toFixed(1)}M`,
   },
   {
     id: "area",
+    key: "area",
     question: "WHICH HAS THE LARGER LAND AREA?",
     getValue: (c) => COUNTRIES[c].area,
     explain: (w, l, wv, lv) => `${w}: ${wv.toLocaleString()} km² vs ${l}: ${lv.toLocaleString()} km²`,
   },
   {
     id: "older",
+    key: "older",
     question: "WHICH COUNTRY IS OLDER?",
     getValue: (c) => -COUNTRIES[c].founded,
     explain: (w, l, wv, lv) => `${w}: est. ${-wv} vs ${l}: est. ${-lv}`,
   },
   {
     id: "gdp",
+    key: "gdp",
     question: "WHICH HAS THE HIGHER GDP?",
     getValue: (c) => COUNTRIES[c].gdp,
     explain: (w, l, wv, lv) => {
@@ -206,78 +211,91 @@ export const QUESTION_TYPES: QuestionType[] = [
   },
   {
     id: "gdppc",
+    key: "gdppc",
     question: "WHICH HAS HIGHER GDP PER CAPITA?",
     getValue: (c) => COUNTRIES[c].gdp / COUNTRIES[c].pop,
     explain: (w, l, wv, lv) => `${w}: $${Math.round(wv).toLocaleString()}/person vs ${l}: $${Math.round(lv).toLocaleString()}/person`,
   },
   {
     id: "density",
+    key: "density",
     question: "WHICH IS MORE DENSELY POPULATED?",
     getValue: (c) => COUNTRIES[c].pop / COUNTRIES[c].area,
     explain: (w, l, wv, lv) => `${w}: ${wv.toFixed(1)}/km² vs ${l}: ${lv.toFixed(1)}/km²`,
   },
   {
     id: "lifeExp",
+    key: "lifeExp",
     question: "WHICH HAS HIGHER LIFE EXPECTANCY?",
     getValue: (c) => COUNTRIES[c].lifeExp,
     explain: (w, l, wv, lv) => `${w}: ${wv} yrs vs ${l}: ${lv} yrs`,
   },
   {
     id: "medianAge",
+    key: "medianAge",
     question: "WHICH HAS THE HIGHER MEDIAN AGE?",
     getValue: (c) => COUNTRIES[c].medianAge,
     explain: (w, l, wv, lv) => `${w}: ${wv} yrs vs ${l}: ${lv} yrs`,
   },
   {
     id: "co2pc",
+    key: "co2pc",
     question: "WHICH EMITS MORE CO₂ PER PERSON?",
     getValue: (c) => COUNTRIES[c].co2pc,
     explain: (w, l, wv, lv) => `${w}: ${wv}t vs ${l}: ${lv}t per capita`,
   },
   {
     id: "unesco",
+    key: "unesco",
     question: "WHICH HAS MORE UNESCO WORLD HERITAGE SITES?",
     getValue: (c) => COUNTRIES[c].unesco,
     explain: (w, l, wv, lv) => `${w}: ${wv} sites vs ${l}: ${lv} sites`,
   },
   {
     id: "fifa",
+    key: "fifa",
     question: "WHICH HAS THE BETTER FIFA RANKING?",
     getValue: (c) => -COUNTRIES[c].fifa,
     explain: (w, l, wv, lv) => `${w}: #${-wv} vs ${l}: #${-lv}`,
   },
   {
     id: "wcApps",
+    key: "wcApps",
     question: "WHICH HAS MORE WORLD CUP APPEARANCES?",
     getValue: (c) => COUNTRIES[c].wcApps,
     explain: (w, l, wv, lv) => `${w}: ${wv} appearances vs ${l}: ${lv} appearances`,
   },
   {
     id: "nobel",
+    key: "nobel",
     question: "WHICH HAS WON MORE NOBEL PRIZES?",
     getValue: (c) => COUNTRIES[c].nobel,
     explain: (w, l, wv, lv) => `${w}: ${wv} prizes vs ${l}: ${lv} prizes`,
   },
   {
     id: "unemployment",
+    key: "unemployment",
     question: "WHICH HAS LOWER UNEMPLOYMENT?",
     getValue: (c) => -COUNTRIES[c].unemployment,
     explain: (w, l, wv, lv) => `${w}: ${-wv}% vs ${l}: ${-lv}%`,
   },
   {
     id: "elevation",
+    key: "elevation",
     question: "WHICH HAS HIGHER AVERAGE ELEVATION?",
     getValue: (c) => COUNTRIES[c].elevation,
     explain: (w, l, wv, lv) => `${w}: ${wv}m vs ${l}: ${lv}m`,
   },
   {
     id: "forest",
+    key: "forest",
     question: "WHICH HAS MORE FOREST COVERAGE?",
     getValue: (c) => COUNTRIES[c].forest,
     explain: (w, l, wv, lv) => `${w}: ${wv}% vs ${l}: ${lv}%`,
   },
   {
     id: "coastline",
+    key: "coastline",
     question: "WHICH HAS A LONGER COASTLINE?",
     getValue: (c) => COUNTRIES[c].coastline,
     explain: (w, l, wv, lv) => `${w}: ${wv.toLocaleString()} km vs ${l}: ${lv.toLocaleString()} km`,
