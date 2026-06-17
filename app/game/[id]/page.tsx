@@ -97,7 +97,11 @@ export default function GameRoom() {
       return;
     }
 
-    // Tied — add one sudden death question.
+    // Tied — add one sudden death question, unless we've hit the 15-question cap.
+    if (row.questions.length >= 15) {
+      await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
+      return;
+    }
     const newQ = generateSuddenDeathQuestion(row.questions, getAllMatchPairs());
     if (!newQ) {
       await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
