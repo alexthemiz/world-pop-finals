@@ -1,5 +1,16 @@
 // 8-bit sound effects via Web Audio API — no external files needed.
 
+let muted = false;
+
+export function getMuted() { return muted; }
+export function setMuted(val: boolean) {
+  muted = val;
+  if (typeof localStorage !== "undefined") localStorage.setItem("wpf-muted", val ? "1" : "0");
+}
+export function initMuted() {
+  if (typeof localStorage !== "undefined") muted = localStorage.getItem("wpf-muted") === "1";
+}
+
 function tone(
   ctx: AudioContext,
   freq: number,
@@ -21,6 +32,7 @@ function tone(
 }
 
 export function playCorrect() {
+  if (muted) return;
   try {
     const ctx = new AudioContext();
     const t = ctx.currentTime;
@@ -31,6 +43,7 @@ export function playCorrect() {
 }
 
 export function playWrong() {
+  if (muted) return;
   try {
     const ctx = new AudioContext();
     const t = ctx.currentTime;
@@ -40,6 +53,7 @@ export function playWrong() {
 }
 
 export function playWin() {
+  if (muted) return;
   try {
     const ctx = new AudioContext();
     const t = ctx.currentTime;
@@ -50,6 +64,7 @@ export function playWin() {
 }
 
 export function playLose() {
+  if (muted) return;
   try {
     const ctx = new AudioContext();
     const t = ctx.currentTime;
