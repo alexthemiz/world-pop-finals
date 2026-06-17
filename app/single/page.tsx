@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Pitch from "@/components/Pitch";
 import ScoreBoard from "@/components/ScoreBoard";
 import NavBar from "@/components/NavBar";
@@ -13,8 +13,9 @@ import { SOURCES } from "@/lib/countries";
 import { playCorrect, playWrong, playWin, playLose } from "@/lib/sounds";
 import { supabase } from "@/lib/supabase";
 
-export default function SinglePlayer() {
+function SinglePlayerContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [chosen, setChosen] = useState<string | null>(null);
@@ -22,8 +23,14 @@ export default function SinglePlayer() {
   const [questionStats, setQuestionStats] = useState<Record<string, { correct: number; total: number }>>({});
 
   useEffect(() => {
-    setQuestions(generateQuestions(getAllMatchPairs()));
-  }, []);
+    const home = searchParams.get("home");
+    const away = searchParams.get("away");
+    const allPairs = getAllMatchPairs();
+    const matchList = home && away
+      ? allPairs.filter((p) => (p.home === home && p.away === away) || (p.home === away && p.away === home))
+      : allPairs;
+    setQuestions(generateQuestions(matchList.length > 0 ? matchList : allPairs));
+  }, [searchParams]);
 
   const currentIndex = answers.length;
   const current = questions[currentIndex];
@@ -116,6 +123,14 @@ export default function SinglePlayer() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function SinglePlayer() {
+  return (
+    <Suspense>
+      <SinglePlayerContent />
+    </Suspense>
   );
 }
 

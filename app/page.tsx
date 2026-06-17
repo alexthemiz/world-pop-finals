@@ -69,6 +69,25 @@ function HomeContent() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [myGames, setMyGames] = useState<GameRow[]>([]);
+  const [pickedCountry, setPickedCountry] = useState("");
+  const [pickedOpponent, setPickedOpponent] = useState("");
+
+  const allPairs = getAllMatchPairs();
+  const allCountries = Array.from(new Set(allPairs.flatMap((p) => [p.home, p.away]))).sort();
+  const opponents = pickedCountry
+    ? allPairs.filter((p) => p.home === pickedCountry || p.away === pickedCountry)
+        .map((p) => (p.home === pickedCountry ? { country: p.away, group: p.group, home: p.home, away: p.away } : { country: p.home, group: p.group, home: p.home, away: p.away }))
+    : [];
+
+  function getMatchPairs() {
+    if (pickedCountry && pickedOpponent) {
+      const pair = allPairs.find(
+        (p) => (p.home === pickedCountry && p.away === pickedOpponent) || (p.home === pickedOpponent && p.away === pickedCountry)
+      );
+      return pair ? [pair] : allPairs;
+    }
+    return allPairs;
+  }
 
   useEffect(() => {
     if (searchParams.get("mode") === "challenge") setMode("vs-friend");
@@ -96,7 +115,7 @@ function HomeContent() {
     setError(null);
     try {
       const id = makeGameId();
-      const questions = generateQuestions(getAllMatchPairs());
+      const questions = generateQuestions(getMatchPairs());
       const { error: insertError } = await supabase.from("games").insert({
         id,
         questions,
@@ -233,9 +252,38 @@ function HomeContent() {
             </div>
           )}
 
+          {/* Match picker */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 320 }}>
+            <label style={{ fontSize: 8, color: "var(--text-dim)" }}>PICK A MATCH</label>
+            <select
+              value={pickedCountry}
+              onChange={(e) => { setPickedCountry(e.target.value); setPickedOpponent(""); }}
+              style={{ fontFamily: "var(--font-press-start), monospace", fontSize: 8, padding: "8px 10px", background: "#0a0e14", border: "2px solid var(--panel-border)", color: "var(--text)", borderRadius: 4, width: "100%", cursor: "pointer" }}
+            >
+              <option value="">RANDOM</option>
+              {allCountries.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+            </select>
+            {opponents.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+                {opponents.map(({ country, group }) => (
+                  <button
+                    key={country}
+                    onClick={() => setPickedOpponent(pickedOpponent === country ? "" : country)}
+                    style={{ fontSize: 7, padding: "7px 10px", background: pickedOpponent === country ? "var(--gold)" : "var(--panel)", color: pickedOpponent === country ? "#000" : "var(--text-dim)", border: `2px solid ${pickedOpponent === country ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer", whiteSpace: "nowrap" }}
+                  >
+                    vs {country.toUpperCase()} · GRP {group}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Single player */}
           {mode === "single" && (
-            <button onClick={() => router.push("/single")} style={ctaButtonStyle}>
+            <button
+              onClick={() => router.push(`/single${pickedCountry && pickedOpponent ? `?home=${encodeURIComponent(pickedCountry)}&away=${encodeURIComponent(pickedOpponent)}` : ""}`)}
+              style={ctaButtonStyle}
+            >
               PLAY
             </button>
           )}
