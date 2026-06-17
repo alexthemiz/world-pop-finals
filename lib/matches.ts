@@ -121,8 +121,6 @@ export interface MatchInfo {
   date: string;
 }
 
-const TODAY = "Wed Jun 17";
-
 export function getMatchInfo(home: string, away: string): MatchInfo | null {
   const match = MATCHES.find(
     (m) => (m.home === home && m.away === away) || (m.home === away && m.away === home)
@@ -142,10 +140,9 @@ export function getMatchInfo(home: string, away: string): MatchInfo | null {
     };
   }
 
-  const dateLabel = match.date === TODAY ? "Today" : match.date;
   return {
     type: "upcoming",
-    text: `${dateLabel} · ${match.time}`,
+    text: `${match.date} · ${match.time}`,
     venue: match.venue,
     date: match.date,
   };
