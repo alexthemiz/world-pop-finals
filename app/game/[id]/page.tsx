@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions, generateSuddenDeathQuestion } from "@/lib/questions";
-import { getAllMatchPairs } from "@/lib/matches";
+import { getAllMatchPairs } from "@/lib/matches"; // still needed for generateQuestions on game create / play again
 import { SOURCES } from "@/lib/countries";
 import Pitch from "@/components/Pitch";
 import ScoreBoard from "@/components/ScoreBoard";
@@ -97,12 +97,8 @@ export default function GameRoom() {
       return;
     }
 
-    // Tied — add one sudden death question, unless we've hit the 15-question cap.
-    if (row.questions.length >= 15) {
-      await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
-      return;
-    }
-    const newQ = generateSuddenDeathQuestion(row.questions, getAllMatchPairs());
+    // Tied — add one more question from the same match pair, or draw if exhausted.
+    const newQ = generateSuddenDeathQuestion(row.questions);
     if (!newQ) {
       await supabase.from("games").update({ phase: "finished" }).eq("id", id).eq("phase", row.phase);
       return;

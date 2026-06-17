@@ -94,32 +94,15 @@ export function generateQuestions(
 }
 
 /**
- * Generates a single sudden-death question. Tries to pick an unused question
- * type from the existing match first; falls back to a new match if exhausted.
+ * Generates a single sudden-death question from the same match pair.
+ * Returns null if all question types for this pair have been exhausted (draw).
  */
-export function generateSuddenDeathQuestion(
-  existing: Question[],
-  matchList: MatchPair[]
-): Question | null {
-  // Find which question texts have already been asked for this match pair.
+export function generateSuddenDeathQuestion(existing: Question[]): Question | null {
   const lastQ = existing[existing.length - 1];
-  const usedTexts = new Set(
-    existing.filter((q) => q.home === lastQ.home && q.away === lastQ.away).map((q) => q.questionText)
-  );
-
-  // Try to pick an unused type from the same match.
+  const usedTexts = new Set(existing.map((q) => q.questionText));
   const sameMatch: MatchPair = { home: lastQ.home, away: lastQ.away, group: lastQ.group };
   const remaining = allQuestionsForMatch(sameMatch).filter((q) => !usedTexts.has(q.questionText));
-  if (remaining.length > 0) return remaining[0];
-
-  // Fall back to a new match.
-  const usedPairs = new Set(existing.map((q) => `${q.home}|${q.away}`));
-  const available = matchList.filter(
-    (m) => !usedPairs.has(`${m.home}|${m.away}`) && COUNTRIES[m.home] && COUNTRIES[m.away]
-  );
-  if (available.length === 0) return null;
-  const newMatch = available[Math.floor(Math.random() * available.length)];
-  return allQuestionsForMatch(newMatch)[0];
+  return remaining.length > 0 ? remaining[0] : null;
 }
 
 export function usedPairKeys(questions: Question[]): Set<string> {
