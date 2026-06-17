@@ -26,15 +26,15 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "10px 16px",
+        padding: "10px 12px",
         background: "var(--panel)",
         borderBottom: "2px solid var(--panel-border)",
-        flexWrap: "wrap",
         gap: 8,
+        minWidth: 0,
       }}
     >
-      <Link href="/" style={{ fontSize: 9, color: "var(--gold)", textDecoration: "none" }}>
-        ◀ WORLD POP FINALS
+      <Link href="/" style={{ fontSize: "clamp(7px, 2vw, 9px)", color: "var(--gold)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis" }}>
+        ◀ WPF
       </Link>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -45,7 +45,7 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
               onClick={() => router.push(m === "single" ? "/single" : "/?mode=challenge")}
               style={{
                 fontSize: 8,
-                padding: "7px 12px",
+                padding: "7px 8px",
                 background: active === m ? "var(--gold)" : "transparent",
                 color: active === m ? "#000" : "var(--text-dim)",
                 border: "none",
