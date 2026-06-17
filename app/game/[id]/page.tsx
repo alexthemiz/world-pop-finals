@@ -367,11 +367,6 @@ export default function GameRoom() {
         {currentQuestion && !waitingForNextRound ? (
           <>
             <Pitch question={currentQuestion} onAnswer={handleAnswer} chosen={chosen} disabled={!!chosen || answering} />
-            {chosen && (
-              <div style={{ textAlign: "center", fontSize: 8, color: "var(--text-dim)" }}>
-                {currentQuestion.explanation}
-              </div>
-            )}
           </>
         ) : (
           <CenteredMessage>WAITING FOR {oppName.toUpperCase()}...</CenteredMessage>

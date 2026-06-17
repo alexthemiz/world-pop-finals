@@ -113,11 +113,6 @@ export default function SinglePlayer() {
         {current && (
           <Pitch question={current} onAnswer={handleAnswer} chosen={chosen} disabled={!!chosen} />
         )}
-        {chosen && current && (
-          <div style={{ textAlign: "center", fontSize: 8, color: "var(--text-dim)" }}>
-            {current.explanation}
-          </div>
-        )}
       </main>
       <Footer />
     </div>
