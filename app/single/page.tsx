@@ -11,6 +11,7 @@ import { generateQuestions, type Question } from "@/lib/questions";
 import { getAllMatchPairs } from "@/lib/matches";
 import { SOURCES } from "@/lib/countries";
 import { playCorrect, playWrong, playWin, playLose } from "@/lib/sounds";
+import { supabase } from "@/lib/supabase";
 
 export default function SinglePlayer() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function SinglePlayer() {
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [chosen, setChosen] = useState<string | null>(null);
   const resultSoundPlayed = useRef(false);
+  const [questionStats, setQuestionStats] = useState<Record<string, { correct: number; total: number }>>({});
 
   useEffect(() => {
     setQuestions(generateQuestions(getAllMatchPairs()));
@@ -27,6 +29,18 @@ export default function SinglePlayer() {
   const current = questions[currentIndex];
   const finished = questions.length > 0 && currentIndex >= questions.length;
   const score = useMemo(() => answers.filter(Boolean).length, [answers]);
+
+  useEffect(() => {
+    if (!finished) return;
+    supabase.from("question_stats").select("*").then(({ data }) => {
+      if (!data) return;
+      const map: Record<string, { correct: number; total: number }> = {};
+      data.forEach((r: { question_type: string; correct: number; total: number }) => {
+        map[r.question_type] = { correct: r.correct, total: r.total };
+      });
+      setQuestionStats(map);
+    });
+  }, [finished]);
 
   // Play win/lose sound once when results appear.
   useEffect(() => {
@@ -69,7 +83,7 @@ export default function SinglePlayer() {
                 HOME
               </button>
             </div>
-            <QuestionReview questions={questions} answers={answers} />
+            <QuestionReview questions={questions} answers={answers} questionStats={questionStats} />
             <div style={{ textAlign: "left", fontSize: 7, color: "var(--text-dim)", marginTop: 24, lineHeight: 1.8 }}>
               <div style={{ marginBottom: 8 }}>SOURCES:</div>
               {SOURCES.map((s) => (

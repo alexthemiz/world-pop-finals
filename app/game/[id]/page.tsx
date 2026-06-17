@@ -35,6 +35,7 @@ export default function GameRoom() {
   const [chosen, setChosen] = useState<string | null>(null);
   const [answering, setAnswering] = useState(false);
   const resultSoundPlayed = useRef(false);
+  const [questionStats, setQuestionStats] = useState<Record<string, { correct: number; total: number }>>({});
 
   const gameRef = useRef<GameRow | null>(null);
   gameRef.current = game;
@@ -72,6 +73,18 @@ export default function GameRoom() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [id]);
+
+  useEffect(() => {
+    if (game?.phase !== "finished") return;
+    supabase.from("question_stats").select("*").then(({ data }) => {
+      if (!data) return;
+      const map: Record<string, { correct: number; total: number }> = {};
+      data.forEach((r: { question_type: string; correct: number; total: number }) => {
+        map[r.question_type] = { correct: r.correct, total: r.total };
+      });
+      setQuestionStats(map);
+    });
+  }, [game?.phase]);
 
   const maybeAdvancePhase = useCallback(async (row: GameRow) => {
     const total = row.questions.length;
@@ -291,7 +304,7 @@ export default function GameRoom() {
               <button onClick={handlePlayAgain} style={ctaButtonStyle}>PLAY AGAIN</button>
               <button onClick={() => router.push("/")} style={{ ...ctaButtonStyle, background: "transparent" }}>HOME</button>
             </div>
-            <QuestionReview questions={game.questions} answers={myAnswers} />
+            <QuestionReview questions={game.questions} answers={myAnswers} questionStats={questionStats} />
             <div style={{ textAlign: "left", fontSize: 7, color: "var(--text-dim)", marginTop: 24, lineHeight: 1.8 }}>
               <div style={{ marginBottom: 8 }}>SOURCES:</div>
               {SOURCES.map((s) => (

@@ -4,9 +4,10 @@ import { flagUrl } from "@/lib/countries";
 interface Props {
   questions: Question[];
   answers: boolean[]; // player's answers (for single player) — optional
+  questionStats?: Record<string, { correct: number; total: number }>;
 }
 
-export default function QuestionReview({ questions, answers }: Props) {
+export default function QuestionReview({ questions, answers, questionStats }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%", maxWidth: 600, margin: "0 auto", textAlign: "left" }}>
       <div style={{ fontSize: 9, color: "var(--text-dim)", marginBottom: 4 }}>ANSWERS</div>
@@ -69,6 +70,11 @@ export default function QuestionReview({ questions, answers }: Props) {
             <div style={{ fontSize: 7, color: "var(--text-dim)", lineHeight: 1.8 }}>
               {q.explanation}
             </div>
+            {questionStats && questionStats[q.statKey] && questionStats[q.statKey].total > 0 && (
+              <div style={{ fontSize: 7, color: "var(--text-dim)", marginTop: 4 }}>
+                {Math.round((questionStats[q.statKey].correct / questionStats[q.statKey].total) * 100)}% OF PLAYERS GOT THIS RIGHT
+              </div>
+            )}
           </div>
         );
       })}
