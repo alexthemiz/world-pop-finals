@@ -109,7 +109,7 @@ function HomeContent() {
             WORLD POP FINALS
           </h1>
           <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
-            WORLD CUP 2026 · COUNTRY TRIVIA SHOOTOUT
+            COUNTRY TRIVIA SHOOTOUT
           </p>
         </div>
 
