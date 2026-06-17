@@ -12,18 +12,26 @@ function makeGameId(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
-// All 48 WC 2026 nations as flag emojis
-const FLAGS =
-  "🇺🇸 🇲🇽 🇨🇦 🇧🇷 🇦🇷 🇫🇷 🇩🇪 🇪🇸 🇵🇹 🇳🇱 🇧🇪 🏴󠁧󠁢󠁥󠁮󠁧󠁿 🇮🇹 🇭🇷 🇵🇱 🇨🇭 🇺🇦 🇦🇹 🇷🇴 🇭🇺 🇸🇮 🇦🇱 🇬🇪 🇸🇰 🇨🇿 🏴󠁧󠁢󠁳󠁣󠁴󠁿 🇹🇷 🇰🇿 🇲🇦 🇸🇳 🇳🇬 🇨🇲 🇪🇬 🇿🇦 🇨🇮 🇹🇳 🇲🇱 🇨🇩 🇯🇵 🇰🇷 🇦🇺 🇸🇦 🇮🇷 🇮🇩 🇨🇳 🇳🇿 🇺🇾 🇨🇴 🇪🇨 🇧🇴 🇨🇱 🇵🇾 🇻🇪";
-
-const TICKER = `${FLAGS}   ${FLAGS}   `;
+// All 48 WC 2026 nations — ISO codes for flagcdn.com
+const FLAG_CODES = [
+  "us","mx","ca","br","ar","fr","de","es","pt","nl","be","gb-eng",
+  "it","hr","pl","ch","ua","at","ro","hu","si","al","ge","sk","cz",
+  "gb-sct","tr","kz","ma","sn","ng","cm","eg","za","ci","tn","ml",
+  "cd","jp","kr","au","sa","ir","id","cn","nz","uy","co","ec","bo",
+  "cl","py","ve",
+];
 
 function FlagTicker({ direction }: { direction: "left" | "right" }) {
   const animName = direction === "left" ? "wpf-scroll-left" : "wpf-scroll-right";
+  // Duplicate for seamless loop
+  const items = [...FLAG_CODES, ...FLAG_CODES];
   return (
-    <div style={{ overflow: "hidden", width: "100%", background: "rgba(0,0,0,0.55)", borderTop: direction === "right" ? "1px solid rgba(255,255,255,0.07)" : undefined, borderBottom: direction === "left" ? "1px solid rgba(255,255,255,0.07)" : undefined, padding: "6px 0" }}>
-      <div style={{ display: "inline-block", whiteSpace: "nowrap", animation: `${animName} 40s linear infinite`, fontSize: 20, letterSpacing: 4 }}>
-        {TICKER}
+    <div style={{ overflow: "hidden", width: "100%", background: "rgba(0,0,0,0.55)", borderTop: direction === "right" ? "1px solid rgba(255,255,255,0.07)" : undefined, borderBottom: direction === "left" ? "1px solid rgba(255,255,255,0.07)" : undefined, padding: "5px 0" }}>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 12, animation: `${animName} 40s linear infinite`, paddingRight: 12 }}>
+        {items.map((code, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={i} src={`https://flagcdn.com/32x24/${code}.png`} width={32} height={24} alt={code} style={{ display: "block", imageRendering: "pixelated" }} />
+        ))}
       </div>
     </div>
   );
