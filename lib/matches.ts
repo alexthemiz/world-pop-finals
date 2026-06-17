@@ -121,7 +121,7 @@ export interface MatchInfo {
   date: string;
 }
 
-const TODAY = "Tue Jun 16";
+const TODAY = "Wed Jun 17";
 
 export function getMatchInfo(home: string, away: string): MatchInfo | null {
   const match = MATCHES.find(
