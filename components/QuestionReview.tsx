@@ -15,7 +15,18 @@ export default function QuestionReview({ questions, answers, questionStats }: Pr
 
   return (
     <div style={{ display: "flex", flexDirection: "column", width: "100%", maxWidth: 600, margin: "0 auto", textAlign: "left" }}>
+      <style>{`
+        .qr-chevron { display: inline-block; }
+        .qr-detail { display: none; }
+        .qr-detail.open { display: block; }
+        @media (min-width: 640px) {
+          .qr-chevron { display: none; }
+          .qr-detail { display: block !important; }
+        }
+      `}</style>
+
       <div style={{ fontSize: 9, color: "var(--text-dim)", marginBottom: 10 }}>ANSWERS</div>
+
       {questions.map((q, i) => {
         const correct = answers[i] ?? null;
         const isOpen = openIndex === i;
@@ -45,27 +56,28 @@ export default function QuestionReview({ questions, answers, questionStats }: Pr
               <span style={{ fontSize: 7, color: "var(--text)", lineHeight: 1.8, flex: 1 }}>
                 {q.questionText}
               </span>
-              <span style={{
-                fontSize: 8,
-                color: "var(--text-dim)",
-                flexShrink: 0,
-                transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 0.15s",
-                display: "inline-block",
-              }}>▼</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+                {!isDiaspora && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={flagUrl(winnerCountry)} width={22} height={15} alt="" />
+                )}
+                <span style={{ fontSize: 7, color: "var(--gold)" }}>
+                  {q.winner.toUpperCase()}
+                </span>
+              </span>
+              <span
+                className="qr-chevron"
+                style={{
+                  fontSize: 8,
+                  color: "var(--text-dim)",
+                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.15s",
+                }}
+              >▼</span>
             </button>
 
-            {isOpen && (
-              <div style={{ padding: "4px 4px 14px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {!isDiaspora && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={flagUrl(winnerCountry)} width={22} height={15} alt="" />
-                  )}
-                  <span style={{ fontSize: 7, color: "var(--gold)" }}>
-                    {q.winner.toUpperCase()}
-                  </span>
-                </div>
+            <div className={`qr-detail${isOpen ? " open" : ""}`}>
+              <div style={{ padding: "0 4px 12px 24px", display: "flex", flexDirection: "column", gap: 6 }}>
                 <div style={{ fontSize: 7, color: "var(--text-dim)", lineHeight: 1.8 }}>
                   {q.explanation}
                 </div>
@@ -75,7 +87,7 @@ export default function QuestionReview({ questions, answers, questionStats }: Pr
                   </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
         );
       })}
