@@ -286,9 +286,6 @@ function FlagLabel({ country, reverse }: { country: string; reverse?: boolean })
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={flagUrl(country)} width={28} height={19} alt={`${country} flag`} style={{ display: "block" }} />
-      <span style={{ fontSize: "clamp(6px, 1.3vw, 8px)", color: "var(--text)" }}>
-        {country.toUpperCase()}
-      </span>
     </div>
   );
 }
