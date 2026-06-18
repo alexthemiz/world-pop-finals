@@ -1,78 +1,79 @@
+"use client";
+
+import { useState } from "react";
 import type { Question } from "@/lib/questions";
 import { flagUrl } from "@/lib/countries";
 
 interface Props {
   questions: Question[];
-  answers: boolean[]; // player's answers (for single player) — optional
+  answers: boolean[];
   questionStats?: Record<string, { correct: number; total: number }>;
 }
 
 export default function QuestionReview({ questions, answers, questionStats }: Props) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%", maxWidth: 600, margin: "0 auto", textAlign: "left" }}>
-      <div style={{ fontSize: 9, color: "var(--text-dim)", marginBottom: 4 }}>ANSWERS</div>
-      {questions.map((q, i) => {
-        const playerCorrect = answers.length > 0 ? answers[i] : null;
-        return (
-          <div
-            key={i}
-            style={{
-              background: "var(--panel)",
-              border: `2px solid ${playerCorrect === null ? "var(--panel-border)" : playerCorrect ? "var(--green)" : "var(--red)"}`,
-              borderRadius: 6,
-              padding: "12px 14px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            <div style={{ fontSize: 7, color: "var(--text-dim)" }}>Q{i + 1}</div>
-            <div style={{ fontSize: 8, color: "var(--text)", lineHeight: 1.8 }}>
-              {q.questionText}
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {([q.choiceA, q.choiceB] as string[]).map((choice) => {
-                const isWinner = choice === q.winner || choice === q.winner;
-                // For diaspora questions choiceA/B are arrow labels not country names
-                const isDiaspora = q.questionType === "diaspora";
-                const displayLabel = choice;
-                const countryName = isDiaspora
-                  ? (choice.split(" → ")[0])
-                  : choice;
-                const iso = !isDiaspora ? flagUrl(countryName) : null;
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-                return (
-                  <div
-                    key={choice}
-                    style={{
-                      flex: 1,
-                      minWidth: 120,
-                      background: isWinner ? "rgba(46,204,113,0.15)" : "rgba(255,59,59,0.12)",
-                      border: `2px solid ${isWinner ? "var(--green)" : "var(--red)"}`,
-                      borderRadius: 4,
-                      padding: "8px 10px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                    }}
-                  >
-                    {iso && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={iso} width={22} height={15} alt="" style={{ flexShrink: 0 }} />
-                    )}
-                    <span style={{ fontSize: 7, color: "var(--text)" }}>
-                      {displayLabel.toUpperCase()}
-                    </span>
+  return (
+    <div style={{ display: "flex", flexDirection: "column", width: "100%", maxWidth: 600, margin: "0 auto", textAlign: "left" }}>
+      <div style={{ fontSize: 9, color: "var(--text-dim)", marginBottom: 10 }}>ANSWERS</div>
+      {questions.map((q, i) => {
+        const correct = answers[i] ?? null;
+        const isOpen = openIndex === i;
+        const isDiaspora = q.questionType === "diaspora";
+        const winnerCountry = isDiaspora ? q.winner.split(" → ")[0] : q.winner;
+        const stat = questionStats?.[q.statKey];
+
+        return (
+          <div key={i} style={{ borderBottom: "1px solid var(--panel-border)" }}>
+            <button
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "11px 4px",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <span style={{ fontSize: 10, color: correct ? "var(--green)" : "var(--red)", flexShrink: 0, width: 14 }}>
+                {correct ? "✓" : "✗"}
+              </span>
+              <span style={{ fontSize: 7, color: "var(--text)", lineHeight: 1.8, flex: 1 }}>
+                {q.questionText}
+              </span>
+              <span style={{
+                fontSize: 8,
+                color: "var(--text-dim)",
+                flexShrink: 0,
+                transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                transition: "transform 0.15s",
+                display: "inline-block",
+              }}>▼</span>
+            </button>
+
+            {isOpen && (
+              <div style={{ padding: "4px 4px 14px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {!isDiaspora && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={flagUrl(winnerCountry)} width={22} height={15} alt="" />
+                  )}
+                  <span style={{ fontSize: 7, color: "var(--gold)" }}>
+                    {q.winner.toUpperCase()}
+                  </span>
+                </div>
+                <div style={{ fontSize: 7, color: "var(--text-dim)", lineHeight: 1.8 }}>
+                  {q.explanation}
+                </div>
+                {stat && stat.total > 0 && (
+                  <div style={{ fontSize: 7, color: "var(--text-dim)" }}>
+                    {Math.round((stat.correct / stat.total) * 100)}% OF PLAYERS GOT THIS RIGHT
                   </div>
-                );
-              })}
-            </div>
-            <div style={{ fontSize: 7, color: "var(--text-dim)", lineHeight: 1.8 }}>
-              {q.explanation}
-            </div>
-            {questionStats && questionStats[q.statKey] && questionStats[q.statKey].total > 0 && (
-              <div style={{ fontSize: 7, color: "var(--text-dim)", marginTop: 4 }}>
-                {Math.round((questionStats[q.statKey].correct / questionStats[q.statKey].total) * 100)}% OF PLAYERS GOT THIS RIGHT
+                )}
               </div>
             )}
           </div>
