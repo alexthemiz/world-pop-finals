@@ -176,7 +176,7 @@ function HomeContent() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             padding: "24px 24px",
             paddingTop: 58,
             paddingBottom: 58,
@@ -275,30 +275,32 @@ function HomeContent() {
 
           {/* VS Friend */}
           {mode === "vs-friend" && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, width: 280 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
               <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
                 YOUR NAME
               </label>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="PLAYER 1"
-                maxLength={16}
-                style={{
-                  fontFamily: "var(--font-press-start), monospace",
-                  fontSize: 10,
-                  padding: 10,
-                  background: "#0a0e14",
-                  border: "2px solid var(--panel-border)",
-                  color: "var(--text)",
-                  borderRadius: 4,
-                  width: "100%",
-                }}
-              />
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="PLAYER 1"
+                  maxLength={16}
+                  style={{
+                    fontFamily: "var(--font-press-start), monospace",
+                    fontSize: 10,
+                    padding: 10,
+                    background: "#0a0e14",
+                    border: "2px solid var(--panel-border)",
+                    color: "var(--text)",
+                    borderRadius: 4,
+                    width: 140,
+                  }}
+                />
+                <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
+                  {creating ? "..." : "CREATE GAME"}
+                </button>
+              </div>
               {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
-              <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
-                {creating ? "CREATING..." : "CREATE GAME"}
-              </button>
               {myGames.length > 0 && (
                 <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", marginTop: 6 }}>
                   <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
