@@ -18,7 +18,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ## Key files
 - app/page.tsx — home screen (mode select + name entry)
-- app/single/page.tsx — single player (15Q, client-side only)
+- app/single/page.tsx — single player (10Q, client-side only)
 - app/game/[id]/page.tsx — multiplayer game room
 - lib/questions.ts — question generation logic
 - lib/supabase.ts — supabase client + GameRow type

@@ -74,7 +74,13 @@ function makeDiasporaQuestion(match: MatchPair): Question | null {
 
 /** All possible questions for a match, shuffled. */
 function allQuestionsForMatch(match: MatchPair): Question[] {
-  const questions: Question[] = QUESTION_TYPES.map((_, i) => makeStatQuestion(match, i));
+  const { home, away } = match;
+  const questions: Question[] = [];
+  QUESTION_TYPES.forEach((qType, i) => {
+    if (qType.getValue(home) !== qType.getValue(away)) {
+      questions.push(makeStatQuestion(match, i));
+    }
+  });
   const diaspora = makeDiasporaQuestion(match);
   if (diaspora) questions.push(diaspora);
   return shuffle(questions);
@@ -93,7 +99,7 @@ export function generateQuestions(
   );
   if (available.length === 0) return [];
   const match = available[Math.floor(Math.random() * available.length)];
-  return allQuestionsForMatch(match).slice(0, 5);
+  return allQuestionsForMatch(match).slice(0, 10);
 }
 
 /**
