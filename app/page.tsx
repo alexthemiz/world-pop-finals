@@ -237,7 +237,7 @@ function HomeContent() {
             >
               RANDOM
             </button>
-            <label style={{ fontSize: 8, color: "var(--text-dim)" }}>OR PICK A MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A MATCH</label>
             <select
               value={pickedMatch}
               onChange={(e) => setPickedMatch(e.target.value)}
