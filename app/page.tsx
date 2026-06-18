@@ -70,6 +70,8 @@ function HomeContent() {
   const [error, setError] = useState<string | null>(null);
   const [myGames, setMyGames] = useState<GameRow[]>([]);
   const [pickedMatch, setPickedMatch] = useState("");
+  const [waitingGameId, setWaitingGameId] = useState<string | null>(null);
+  const [gameUrl, setGameUrl] = useState("");
 
   const allPairs = getAllMatchPairs();
 
@@ -106,6 +108,21 @@ function HomeContent() {
       .then(({ data }) => { if (data) setMyGames(data as GameRow[]); });
   }, []);
 
+  useEffect(() => {
+    if (!waitingGameId) return;
+    const channel = supabase
+      .channel(`home-waiting-${waitingGameId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "games", filter: `id=eq.${waitingGameId}` },
+        (payload) => {
+          if ((payload.new as { phase: string }).phase === "active") {
+            router.push(`/game/${waitingGameId}`);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [waitingGameId, router]);
+
   async function handleCreateGame() {
     if (!name.trim()) {
       setError("ENTER YOUR NAME FIRST");
@@ -126,7 +143,8 @@ function HomeContent() {
       });
       if (insertError) throw insertError;
       localStorage.setItem(`world-pop-finals:${id}`, "player1");
-      router.push(`/game/${id}`);
+      setWaitingGameId(id);
+      setGameUrl(`${window.location.origin}/game/${id}`);
     } catch (e) {
       setError("COULDN'T CREATE GAME. TRY AGAIN.");
       console.error(e);
@@ -274,7 +292,7 @@ function HomeContent() {
           )}
 
           {/* VS Friend */}
-          {mode === "vs-friend" && (
+          {mode === "vs-friend" && !waitingGameId && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
               <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
                 YOUR NAME
@@ -323,6 +341,30 @@ function HomeContent() {
                   })}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Waiting for opponent */}
+          {waitingGameId && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, maxWidth: 340, width: "100%", textAlign: "center" }}>
+              <div style={{ fontSize: 12, color: "var(--gold)" }}>WAITING FOR OPPONENT...</div>
+              <div style={{ fontSize: 8, color: "var(--text-dim)" }}>SHARE THIS LINK:</div>
+              <div style={{ fontSize: 7, background: "var(--panel)", border: "2px solid var(--panel-border)", borderRadius: 6, padding: 12, wordBreak: "break-all", width: "100%" }}>
+                {gameUrl}
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={() => navigator.clipboard.writeText(gameUrl)} style={ctaButtonStyle}>
+                  COPY LINK
+                </button>
+                {typeof navigator !== "undefined" && "share" in navigator && (
+                  <button onClick={() => navigator.share({ title: "World Pop Finals", text: `Join my game!`, url: gameUrl })} style={ctaButtonStyle}>
+                    SHARE
+                  </button>
+                )}
+              </div>
+              <button onClick={() => setWaitingGameId(null)} style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}>
+                CANCEL
+              </button>
             </div>
           )}
         </main>
