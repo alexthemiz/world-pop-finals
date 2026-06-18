@@ -229,29 +229,6 @@ function HomeContent() {
             ))}
           </div>
 
-          {myGames.length > 0 && (
-            <div style={{ width: "100%", maxWidth: 340, fontSize: 8, color: "var(--text-dim)" }}>
-              <div style={{ color: "var(--gold)", marginBottom: 10, fontSize: 9 }}>
-                YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
-              </div>
-              {myGames.map((g) => {
-                const iP1 = g.player1_uuid === uuid;
-                const myName = iP1 ? g.player1_name : g.player2_name;
-                const oppName = iP1 ? g.player2_name : g.player1_name;
-                const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
-                const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
-                const result = my > opp ? "W" : my < opp ? "L" : "D";
-                const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
-                return (
-                  <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
-                    <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
-                    <span style={{ color }}>{result} {my}–{opp}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 340 }}>
             <button
@@ -332,6 +309,28 @@ function HomeContent() {
               <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
                 {creating ? "CREATING..." : "CREATE GAME"}
               </button>
+              {myGames.length > 0 && (
+                <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 6 }}>
+                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9 }}>
+                    YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
+                  </div>
+                  {myGames.map((g) => {
+                    const iP1 = g.player1_uuid === uuid;
+                    const myName = iP1 ? g.player1_name : g.player2_name;
+                    const oppName = iP1 ? g.player2_name : g.player1_name;
+                    const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
+                    const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
+                    const result = my > opp ? "W" : my < opp ? "L" : "D";
+                    const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
+                    return (
+                      <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
+                        <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
+                        <span style={{ color }}>{result} {my}–{opp}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </main>
