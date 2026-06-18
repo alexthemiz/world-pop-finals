@@ -275,19 +275,8 @@ function HomeContent() {
 
           {/* VS Friend */}
           {mode === "vs-friend" && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-                width: 280,
-                background: "var(--panel)",
-                border: "3px solid var(--panel-border)",
-                borderRadius: 6,
-                padding: 20,
-              }}
-            >
-              <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "left" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, width: 280 }}>
+              <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
                 YOUR NAME
               </label>
               <input
@@ -303,6 +292,7 @@ function HomeContent() {
                   border: "2px solid var(--panel-border)",
                   color: "var(--text)",
                   borderRadius: 4,
+                  width: "100%",
                 }}
               />
               {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
@@ -310,8 +300,8 @@ function HomeContent() {
                 {creating ? "CREATING..." : "CREATE GAME"}
               </button>
               {myGames.length > 0 && (
-                <div style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 6 }}>
-                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9 }}>
+                <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", marginTop: 6 }}>
+                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
                     YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
                   </div>
                   {myGames.map((g) => {
