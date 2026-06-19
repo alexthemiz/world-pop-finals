@@ -341,12 +341,12 @@ export const QUESTION_TYPES: QuestionType[] = [
     key: "firearmsRate",
     question: "WHICH HAS MORE CIVILIAN FIREARMS PER 100 PEOPLE?",
     getValue: (c) => COUNTRIES[c].firearmsRate,
-    explain: (w, l, wv, lv) => `${w}: ${wv} per 100 people vs ${l}: ${lv} per 100 people`,
+    explain: (w, l, wv, lv) => `${w}: ${wv.toFixed(1)} per 100 people vs ${l}: ${lv.toFixed(1)} per 100 people`,
   },
   {
     id: "teaPc",
     key: "teaPc",
-    question: "WHICH DRINKS MORE TEA PER PERSON PER YEAR?",
+    question: "WHICH DRINKS MORE TEA (OR MATE) PER PERSON PER YEAR?",
     getValue: (c) => COUNTRIES[c].teaPc,
     explain: (w, l, wv, lv) => `${w}: ${wv.toFixed(2)} kg/person vs ${l}: ${lv.toFixed(2)} kg/person`,
   },
@@ -355,7 +355,7 @@ export const QUESTION_TYPES: QuestionType[] = [
     key: "publicHolidays",
     question: "WHICH HAS MORE NATIONAL PUBLIC HOLIDAYS?",
     getValue: (c) => COUNTRIES[c].publicHolidays,
-    explain: (w, l, wv, lv) => `${w}: ${wv} days vs ${l}: ${lv} days`,
+    explain: (w, l, wv, lv) => `${w}: ${wv} holidays vs ${l}: ${lv} holidays`,
   },
 ];
 
