@@ -30,6 +30,7 @@ function SinglePlayerContent() {
       ? allPairs.filter((p) => (p.home === home && p.away === away) || (p.home === away && p.away === home))
       : allPairs;
     setQuestions(generateQuestions(matchList.length > 0 ? matchList : allPairs));
+    supabase.rpc("increment_games_played").then(({ error }) => { if (error) console.error(error); });
   }, [searchParams]);
 
   const currentIndex = answers.length;

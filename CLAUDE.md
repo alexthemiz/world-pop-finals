@@ -31,13 +31,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 - Sequential pacing — one major feature at a time
 - Simple changes directly to main; visual/risky changes on a feature branch
 - Never guess — if something is unclear, ask
-- Single player is client-side only, no DB
+- Single player gameplay is client-side only, no DB (it fires one
+  best-effort RPC call to bump the games-played counter, nothing else)
 - Multiplayer uses Supabase Realtime subscription on the games row
 
 ## Supabase table: games
 id text PK | questions jsonb | player1_name text | player2_name text |
 player1_answers jsonb default '[]' | player2_answers jsonb default '[]' |
 phase text default 'waiting' | round int default 1 | created_at timestamptz
+
+## Supabase table: games_played_counter
+Single row (id=1) with a `count bigint`. Incremented via the
+`increment_games_played()` RPC (security definer) whenever a single-player
+or challenge-mode game is started. Home page reads it to show a combined
+"games played" total across both modes.
 
 ## Phase values
 waiting → active → sudden_death → finished

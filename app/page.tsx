@@ -72,6 +72,7 @@ function HomeContent() {
   const [pickedMatch, setPickedMatch] = useState("");
   const [waitingGameId, setWaitingGameId] = useState<string | null>(null);
   const [gameUrl, setGameUrl] = useState("");
+  const [gamesPlayed, setGamesPlayed] = useState<number | null>(null);
 
   const allPairs = getAllMatchPairs();
 
@@ -94,6 +95,15 @@ function HomeContent() {
   useEffect(() => {
     if (searchParams.get("mode") === "challenge") setMode("vs-friend");
   }, [searchParams]);
+
+  useEffect(() => {
+    supabase
+      .from("games_played_counter")
+      .select("count")
+      .eq("id", 1)
+      .single()
+      .then(({ data }) => { if (data) setGamesPlayed(Number(data.count)); });
+  }, []);
 
   useEffect(() => {
     const uuid = getOrCreateUUID();
@@ -142,6 +152,7 @@ function HomeContent() {
         round: 1,
       });
       if (insertError) throw insertError;
+      supabase.rpc("increment_games_played").then(({ error }) => { if (error) console.error(error); });
       localStorage.setItem(`world-pop-finals:${id}`, "player1");
       setWaitingGameId(id);
       setGameUrl(`${window.location.origin}/game/${id}`);
@@ -180,6 +191,9 @@ function HomeContent() {
           0%   { transform: translateX(-50%); }
           100% { transform: translateX(0); }
         }
+        @media (min-width: 768px) {
+          .wpf-main { padding-top: 100px !important; }
+        }
       `}</style>
 
       <PitchBackground />
@@ -189,6 +203,7 @@ function HomeContent() {
 
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
         <main
+          className="wpf-main"
           style={{
             flex: 1,
             display: "flex",
@@ -217,6 +232,11 @@ function HomeContent() {
             <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
               COUNTRY TRIVIA SHOOTOUT
             </p>
+            {gamesPlayed !== null && (
+              <p style={{ fontSize: 8, color: "var(--gold)", marginTop: 12 }}>
+                {gamesPlayed.toLocaleString()} GAMES PLAYED
+              </p>
+            )}
           </div>
 
           {/* Mode toggle */}

@@ -216,6 +216,7 @@ export default function GameRoom() {
       id: newId, questions, player1_name: myName ?? "PLAYER 1", phase: "waiting", round: 1,
     });
     if (error) { console.error(error); return; }
+    supabase.rpc("increment_games_played").then(({ error: rpcError }) => { if (rpcError) console.error(rpcError); });
     localStorage.setItem(storageKey(newId), "player1");
     router.push(`/game/${newId}`);
   }
