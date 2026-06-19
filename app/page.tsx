@@ -132,7 +132,7 @@ function HomeContent() {
     setError(null);
     try {
       const id = makeGameId();
-      const questions = generateQuestions(getMatchPairs());
+      const questions = generateQuestions(getMatchPairs(), new Set(), 5);
       const { error: insertError } = await supabase.from("games").insert({
         id,
         questions,

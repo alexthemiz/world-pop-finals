@@ -92,14 +92,15 @@ function allQuestionsForMatch(match: MatchPair): Question[] {
  */
 export function generateQuestions(
   matchList: MatchPair[],
-  excludePairs: Set<string> = new Set()
+  excludePairs: Set<string> = new Set(),
+  count: number = 10
 ): Question[] {
   const available = matchList.filter(
     (m) => !excludePairs.has(`${m.home}|${m.away}`) && COUNTRIES[m.home] && COUNTRIES[m.away]
   );
   if (available.length === 0) return [];
   const match = available[Math.floor(Math.random() * available.length)];
-  return allQuestionsForMatch(match).slice(0, 10);
+  return allQuestionsForMatch(match).slice(0, count);
 }
 
 /**
