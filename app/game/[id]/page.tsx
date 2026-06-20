@@ -332,6 +332,7 @@ export default function GameRoom() {
               players={[{ name: myName, answers: myAnswers }, { name: oppName, answers: oppAnswers }]}
               totalQuestions={game.questions.length}
             />
+            <QuestionReview questions={game.questions} answers={myAnswers} questionStats={questionStats} />
             <div style={{ display: "flex", gap: 12, justifyContent: "center", margin: "20px 0", flexWrap: "wrap" }}>
               <button onClick={handlePlayAgain} style={ctaButtonStyle}>PLAY AGAIN</button>
               <button
@@ -349,7 +350,6 @@ export default function GameRoom() {
               </button>
               <button onClick={() => router.push("/")} style={{ ...ctaButtonStyle, background: "transparent" }}>HOME</button>
             </div>
-            <QuestionReview questions={game.questions} answers={myAnswers} questionStats={questionStats} />
             <div style={{ textAlign: "left", fontSize: 7, color: "var(--text-dim)", marginTop: 24, lineHeight: 1.8 }}>
               <div style={{ marginBottom: 8 }}>SOURCES:</div>
               {SOURCES.map((s) => (

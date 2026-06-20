@@ -83,6 +83,7 @@ function SinglePlayerContent() {
               YOU SCORED {score} / {questions.length}
             </p>
             <ScoreBoard players={[{ name: "YOU", answers }]} totalQuestions={questions.length} />
+            <QuestionReview questions={questions} answers={answers} questionStats={questionStats} />
             <div style={{ display: "flex", gap: 12, justifyContent: "center", margin: "20px 0" }}>
               <button onClick={() => window.location.assign("/single")} style={ctaButtonStyle}>
                 PLAY AGAIN
@@ -91,7 +92,6 @@ function SinglePlayerContent() {
                 HOME
               </button>
             </div>
-            <QuestionReview questions={questions} answers={answers} questionStats={questionStats} />
             <div style={{ textAlign: "left", fontSize: 7, color: "var(--text-dim)", marginTop: 24, lineHeight: 1.8 }}>
               <div style={{ marginBottom: 8 }}>SOURCES:</div>
               {SOURCES.map((s) => (
