@@ -65,7 +65,11 @@ function PitchBackground() {
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mode, setMode] = useState<"single" | "vs-friend">("single");
+  const [mode, setMode] = useState<"single" | "vs-friend">(() => {
+    if (typeof localStorage === "undefined") return "single";
+    const saved = localStorage.getItem("wpf-mode");
+    return saved === "single" || saved === "vs-friend" ? saved : "single";
+  });
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -98,6 +102,10 @@ function HomeContent() {
   useEffect(() => {
     if (searchParams.get("mode") === "challenge") setMode("vs-friend");
   }, [searchParams]);
+
+  useEffect(() => {
+    localStorage.setItem("wpf-mode", mode);
+  }, [mode]);
 
   useEffect(() => {
     supabase
