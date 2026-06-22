@@ -47,7 +47,8 @@ function loadClipBuffer(url: string): Promise<AudioBuffer> {
   return promise;
 }
 
-// Plays [offset, offset + duration) seconds of an audio clip from public/sounds.
+// Plays [offset, offset + duration) seconds of an audio clip from public/sounds,
+// with a quick fade-in/out so the cut points don't click/pop.
 function playClip(url: string, offset: number, duration: number) {
   if (muted) return;
   loadClipBuffer(url)
@@ -55,7 +56,15 @@ function playClip(url: string, offset: number, duration: number) {
       if (muted || !clipCtx) return;
       const source = clipCtx.createBufferSource();
       source.buffer = buffer;
-      source.connect(clipCtx.destination);
+      const gain = clipCtx.createGain();
+      const fade = 0.05;
+      const t = clipCtx.currentTime;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(1, t + fade);
+      gain.gain.setValueAtTime(1, t + duration - fade);
+      gain.gain.linearRampToValueAtTime(0, t + duration);
+      source.connect(gain);
+      gain.connect(clipCtx.destination);
       source.start(0, offset, duration);
     })
     .catch(() => {});
