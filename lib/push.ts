@@ -23,31 +23,36 @@ export async function subscribeToGamePush(gameId: string, slot: PushSlot): Promi
     return false;
   }
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return false;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return false;
 
-  const registration = await navigator.serviceWorker.register("/sw.js");
-  await navigator.serviceWorker.ready;
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    await navigator.serviceWorker.ready;
 
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapidKey),
-  });
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidKey),
+    });
 
-  const json = subscription.toJSON();
-  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) return false;
+    const json = subscription.toJSON();
+    if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) return false;
 
-  const { error } = await supabase.from("push_subscriptions").upsert({
-    game_id: gameId,
-    slot,
-    endpoint: json.endpoint,
-    p256dh: json.keys.p256dh,
-    auth: json.keys.auth,
-  });
+    const { error } = await supabase.from("push_subscriptions").upsert({
+      game_id: gameId,
+      slot,
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh,
+      auth: json.keys.auth,
+    });
 
-  if (error) {
+    if (error) {
+      console.error(error);
+      return false;
+    }
+    return true;
+  } catch (error) {
     console.error(error);
     return false;
   }
-  return true;
 }
