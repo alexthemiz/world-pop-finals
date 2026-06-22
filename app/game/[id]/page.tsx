@@ -13,6 +13,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import QuestionReview from "@/components/QuestionReview";
 import { playCorrect, playWrong, playWin, playLose } from "@/lib/sounds";
+import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 
 type Slot = "player1" | "player2" | null;
 
@@ -36,6 +37,7 @@ export default function GameRoom() {
   const [answering, setAnswering] = useState(false);
   const resultSoundPlayed = useRef(false);
   const [questionStats, setQuestionStats] = useState<Record<string, { correct: number; total: number }>>({});
+  const [notifyState, setNotifyState] = useState<"idle" | "on" | "blocked">("idle");
 
   const gameRef = useRef<GameRow | null>(null);
   gameRef.current = game;
@@ -376,6 +378,25 @@ export default function GameRoom() {
         <div style={{ textAlign: "center", fontSize: 9, color: "var(--text-dim)" }}>
           {game.phase === "sudden_death" ? `SUDDEN DEATH · ROUND ${game.round}` : `ROUND ${game.round}`}
         </div>
+        {slot && isPushSupported() && (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            {notifyState === "on" ? (
+              <div style={{ fontSize: 7, color: "var(--green)" }}>🔔 ON</div>
+            ) : notifyState === "blocked" ? (
+              <div style={{ fontSize: 7, color: "var(--text-dim)" }}>NOTIFICATIONS BLOCKED</div>
+            ) : (
+              <button
+                onClick={async () => {
+                  const ok = await subscribeToGamePush(id, slot);
+                  setNotifyState(ok ? "on" : "blocked");
+                }}
+                style={{ fontSize: 7, background: "transparent", border: "1px solid var(--panel-border)", color: "var(--text-dim)", borderRadius: 4, padding: "6px 10px", cursor: "pointer" }}
+              >
+                🔔 NOTIFY ME
+              </button>
+            )}
+          </div>
+        )}
         <ScoreBoard
           players={[{ name: myName, answers: myAnswers }, { name: oppName, answers: oppAnswers }]}
           totalQuestions={game.questions.length}
