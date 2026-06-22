@@ -75,6 +75,7 @@ function HomeContent() {
   const [gameUrl, setGameUrl] = useState("");
   const [gamesPlayed, setGamesPlayed] = useState<number | null>(null);
   const [notifyState, setNotifyState] = useState<"idle" | "on" | "blocked">("idle");
+  const [outstandingGames, setOutstandingGames] = useState<GameRow[]>([]);
 
   const allPairs = getAllMatchPairs();
 
@@ -118,6 +119,18 @@ function HomeContent() {
       .order("created_at", { ascending: false })
       .limit(5)
       .then(({ data }) => { if (data) setMyGames(data as GameRow[]); });
+  }, []);
+
+  useEffect(() => {
+    const uuid = getOrCreateUUID();
+    if (!uuid) return;
+    supabase
+      .from("games")
+      .select("id, player1_name, player2_name, player1_answers, player2_answers, phase, player1_uuid, player2_uuid")
+      .in("phase", ["waiting", "active", "sudden_death"])
+      .or(`player1_uuid.eq.${uuid},player2_uuid.eq.${uuid}`)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => { if (data) setOutstandingGames(data as GameRow[]); });
   }, []);
 
   useEffect(() => {
@@ -316,6 +329,44 @@ function HomeContent() {
           {/* VS Friend */}
           {mode === "vs-friend" && !waitingGameId && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              {outstandingGames.length > 0 && (
+                <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
+                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
+                    OUTSTANDING CHALLENGES
+                  </div>
+                  {outstandingGames.map((g) => {
+                    const iP1 = g.player1_uuid === uuid;
+                    const myName = iP1 ? g.player1_name : g.player2_name;
+                    const oppName = iP1 ? g.player2_name : g.player1_name;
+                    const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : "IN PROGRESS";
+                    const statusColor = g.phase === "waiting" ? "var(--text-dim)" : "var(--green)";
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => router.push(`/game/${g.id}`)}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          width: "100%",
+                          padding: "8px 0",
+                          background: "transparent",
+                          border: "none",
+                          borderBottom: "1px solid var(--panel-border)",
+                          color: "var(--text)",
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          fontSize: 8,
+                          textAlign: "left",
+                        }}
+                      >
+                        <span>{myName?.toUpperCase() ?? "YOU"} vs {oppName?.toUpperCase() ?? "?"}</span>
+                        <span style={{ color: statusColor }}>{statusLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
                 YOUR NAME
               </label>
