@@ -6,6 +6,7 @@ import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
 import { getAllMatchPairs } from "@/lib/matches";
+import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 import Footer from "@/components/Footer";
 
 function makeGameId(): string {
@@ -73,6 +74,7 @@ function HomeContent() {
   const [waitingGameId, setWaitingGameId] = useState<string | null>(null);
   const [gameUrl, setGameUrl] = useState("");
   const [gamesPlayed, setGamesPlayed] = useState<number | null>(null);
+  const [notifyState, setNotifyState] = useState<"idle" | "on" | "blocked">("idle");
 
   const allPairs = getAllMatchPairs();
 
@@ -385,6 +387,28 @@ function HomeContent() {
               <button onClick={() => setWaitingGameId(null)} style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}>
                 CANCEL
               </button>
+              {isPushSupported() ? (
+                notifyState === "on" ? (
+                  <div style={{ fontSize: 8, color: "var(--green)" }}>🔔 ON</div>
+                ) : notifyState === "blocked" ? (
+                  <div style={{ fontSize: 8, color: "var(--text-dim)" }}>NOTIFICATIONS BLOCKED</div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      const gameId = waitingGameId;
+                      const ok = await subscribeToGamePush(gameId, "player1");
+                      setNotifyState(ok ? "on" : "blocked");
+                    }}
+                    style={{ ...ctaButtonStyle, fontSize: 8, padding: "10px 16px" }}
+                  >
+                    🔔 NOTIFY ME WHEN THEY JOIN
+                  </button>
+                )
+              ) : (
+                <div style={{ fontSize: 7, color: "var(--text-dim)", maxWidth: 280 }}>
+                  ADD THIS SITE TO YOUR HOME SCREEN TO ENABLE NOTIFICATIONS
+                </div>
+              )}
             </div>
           )}
         </main>
