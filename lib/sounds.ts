@@ -47,19 +47,31 @@ export function playCorrect() {
   } catch {}
 }
 
-// 8-bit boo: slow descending sawtooth "wah-wah" (crowd "boooo")
+let booCtx: AudioContext | null = null;
+let booBufferPromise: Promise<AudioBuffer> | null = null;
+
+function loadBooBuffer(): Promise<AudioBuffer> {
+  if (!booCtx) booCtx = new AudioContext();
+  if (!booBufferPromise) {
+    booBufferPromise = fetch("/sounds/crowd-boo.mp3")
+      .then((res) => res.arrayBuffer())
+      .then((data) => booCtx!.decodeAudioData(data));
+  }
+  return booBufferPromise;
+}
+
+// Real crowd-boo recording, capped to its first 2 seconds.
 export function playWrong() {
   if (muted) return;
-  try {
-    const ctx = new AudioContext();
-    const t = ctx.currentTime;
-    const step = 0.12;
-    // Descending chromatic drop, sawtooth
-    const notes = [392, 370, 349, 330, 311, 294, 277];
-    notes.forEach((f, i) => tone(ctx, f, t + i * step, step * 2.2, "sawtooth", 0.14));
-    // Low sub-drone underneath
-    tone(ctx, 98, t, notes.length * step + 0.2, "sawtooth", 0.06);
-  } catch {}
+  loadBooBuffer()
+    .then((buffer) => {
+      if (muted || !booCtx) return;
+      const source = booCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(booCtx.destination);
+      source.start(0, 0, 2);
+    })
+    .catch(() => {});
 }
 
 // 8-bit win fanfare: triumphant multi-voice ascent
