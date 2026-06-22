@@ -4,6 +4,7 @@ const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET")!;
 
 webpush.setVapidDetails("mailto:noreply@worldpopfinals.app", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
@@ -50,6 +51,10 @@ async function sendTo(gameId: string, sub: Subscription, payload: { title: strin
 }
 
 Deno.serve(async (req) => {
+  if (req.headers.get("x-webhook-secret") !== WEBHOOK_SECRET) {
+    return new Response("unauthorized", { status: 401 });
+  }
+
   const { record, old_record } = await req.json() as { record: GameRow; old_record: GameRow };
   if (!record || !old_record || record.phase === old_record.phase) {
     return new Response("no phase change", { status: 200 });
