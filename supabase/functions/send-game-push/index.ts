@@ -6,6 +6,10 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const WEBHOOK_SECRET = Deno.env.get("WEBHOOK_SECRET")!;
 
+if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY || !WEBHOOK_SECRET) {
+  throw new Error("Missing required env var: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, or WEBHOOK_SECRET");
+}
+
 webpush.setVapidDetails("mailto:noreply@worldpopfinals.app", VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 interface GameRow {
