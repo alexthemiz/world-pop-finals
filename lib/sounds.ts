@@ -1,4 +1,5 @@
-// 8-bit crowd sound effects via Web Audio API — no external files needed.
+// Crowd sound effects via Web Audio API. Correct/wrong use real recordings
+// from public/sounds; win/lose are synthesized 8-bit fanfares.
 
 let muted = false;
 
@@ -31,47 +32,43 @@ function tone(
   osc.stop(startTime + duration);
 }
 
-// 8-bit cheer: two-voice rapid ascending arpeggio (crowd "yeah!")
-export function playCorrect() {
-  if (muted) return;
-  try {
-    const ctx = new AudioContext();
-    const t = ctx.currentTime;
-    const step = 0.055;
-    // Voice 1: ascending C-E-G-C-E-G (square)
-    const v1 = [523, 659, 784, 1047, 1319, 1568];
-    v1.forEach((f, i) => tone(ctx, f, t + i * step, step * 1.8, "square", 0.13));
-    // Voice 2: same but offset + slightly detuned (pulse feel)
-    const v2 = [519, 655, 780, 1041, 1311, 1558];
-    v2.forEach((f, i) => tone(ctx, f, t + i * step + 0.008, step * 1.8, "square", 0.07));
-  } catch {}
+let clipCtx: AudioContext | null = null;
+const clipBufferPromises = new Map<string, Promise<AudioBuffer>>();
+
+function loadClipBuffer(url: string): Promise<AudioBuffer> {
+  if (!clipCtx) clipCtx = new AudioContext();
+  let promise = clipBufferPromises.get(url);
+  if (!promise) {
+    promise = fetch(url)
+      .then((res) => res.arrayBuffer())
+      .then((data) => clipCtx!.decodeAudioData(data));
+    clipBufferPromises.set(url, promise);
+  }
+  return promise;
 }
 
-let booCtx: AudioContext | null = null;
-let booBufferPromise: Promise<AudioBuffer> | null = null;
+// Plays [offset, offset + duration) seconds of an audio clip from public/sounds.
+function playClip(url: string, offset: number, duration: number) {
+  if (muted) return;
+  loadClipBuffer(url)
+    .then((buffer) => {
+      if (muted || !clipCtx) return;
+      const source = clipCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(clipCtx.destination);
+      source.start(0, offset, duration);
+    })
+    .catch(() => {});
+}
 
-function loadBooBuffer(): Promise<AudioBuffer> {
-  if (!booCtx) booCtx = new AudioContext();
-  if (!booBufferPromise) {
-    booBufferPromise = fetch("/sounds/crowd-boo.mp3")
-      .then((res) => res.arrayBuffer())
-      .then((data) => booCtx!.decodeAudioData(data));
-  }
-  return booBufferPromise;
+// Real crowd-cheer recording, using its 24s-26s segment.
+export function playCorrect() {
+  playClip("/sounds/crowd-cheer.mp3", 24, 2);
 }
 
 // Real crowd-boo recording, capped to its first 2 seconds.
 export function playWrong() {
-  if (muted) return;
-  loadBooBuffer()
-    .then((buffer) => {
-      if (muted || !booCtx) return;
-      const source = booCtx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(booCtx.destination);
-      source.start(0, 0, 2);
-    })
-    .catch(() => {});
+  playClip("/sounds/crowd-boo.mp3", 0, 2);
 }
 
 // 8-bit win fanfare: triumphant multi-voice ascent
