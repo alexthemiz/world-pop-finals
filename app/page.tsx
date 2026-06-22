@@ -134,7 +134,7 @@ function HomeContent() {
     if (!uuid) return;
     supabase
       .from("games")
-      .select("id, player1_name, player2_name, player1_answers, player2_answers, phase, player1_uuid, player2_uuid")
+      .select("id, questions, player1_name, player2_name, player1_answers, player2_answers, phase, player1_uuid, player2_uuid")
       .in("phase", ["waiting", "active", "sudden_death"])
       .or(`player1_uuid.eq.${uuid},player2_uuid.eq.${uuid}`)
       .order("created_at", { ascending: false })
@@ -369,8 +369,10 @@ function HomeContent() {
                     const iP1 = g.player1_uuid === uuid;
                     const myName = iP1 ? g.player1_name : g.player2_name;
                     const oppName = iP1 ? g.player2_name : g.player1_name;
-                    const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : "IN PROGRESS";
-                    const statusColor = g.phase === "waiting" ? "var(--text-dim)" : "var(--green)";
+                    const myAnswers = iP1 ? g.player1_answers : g.player2_answers;
+                    const myTurn = g.phase !== "waiting" && myAnswers.length < g.questions.length;
+                    const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : myTurn ? "YOUR TURN" : "WAITING ON OPPONENT";
+                    const statusColor = g.phase === "waiting" ? "var(--text-dim)" : myTurn ? "var(--gold)" : "var(--green)";
                     return (
                       <button
                         key={g.id}
