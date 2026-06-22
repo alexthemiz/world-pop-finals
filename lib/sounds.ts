@@ -61,14 +61,14 @@ function playClip(url: string, offset: number, duration: number) {
     .catch(() => {});
 }
 
-// Real crowd-cheer recording, using its 24s-26s segment.
+// Real crowd-cheer recording, using the second half of its 24s-26s segment.
 export function playCorrect() {
-  playClip("/sounds/crowd-cheer.mp3", 24, 2);
+  playClip("/sounds/crowd-cheer.mp3", 25, 1);
 }
 
-// Real crowd-boo recording, capped to its first 2 seconds.
+// Real crowd-boo recording, using the first half of its first 2 seconds.
 export function playWrong() {
-  playClip("/sounds/crowd-boo.mp3", 0, 2);
+  playClip("/sounds/crowd-boo.mp3", 0, 1);
 }
 
 // 8-bit win fanfare: triumphant multi-voice ascent
