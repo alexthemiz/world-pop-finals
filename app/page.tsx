@@ -141,6 +141,29 @@ function HomeContent() {
       .then(({ data }) => { if (data) setOutstandingGames(data as GameRow[]); });
   }, []);
 
+  const outstandingIds = outstandingGames.map((g) => g.id).join(",");
+  useEffect(() => {
+    if (!outstandingIds) return;
+    const channels = outstandingIds.split(",").map((id) =>
+      supabase
+        .channel(`outstanding-${id}`)
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "games", filter: `id=eq.${id}` },
+          (payload) => {
+            const updated = payload.new as GameRow;
+            setOutstandingGames((prev) =>
+              updated.phase === "finished"
+                ? prev.filter((g) => g.id !== updated.id)
+                : prev.map((g) => (g.id === updated.id ? updated : g))
+            );
+          }
+        )
+        .subscribe()
+    );
+    return () => { channels.forEach((c) => supabase.removeChannel(c)); };
+  }, [outstandingIds]);
+
   useEffect(() => {
     if (!waitingGameId) return;
     const channel = supabase
