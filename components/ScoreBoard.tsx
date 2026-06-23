@@ -50,14 +50,13 @@ export default function ScoreBoard({ players, totalQuestions }: ScoreBoardProps)
           <div
             key={idx}
             style={{
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: "minmax(70px, 130px) 1fr 40px",
               alignItems: "center",
-              justifyContent: "space-between",
               gap: 10,
-              flexWrap: "wrap",
             }}
           >
-            <div style={{ fontSize: 9, color: "var(--text)", minWidth: 70 }}>
+            <div style={{ fontSize: 9, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {p.name || (players.length === 1 ? "YOU" : `PLAYER ${idx + 1}`)}
             </div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -69,7 +68,7 @@ export default function ScoreBoard({ players, totalQuestions }: ScoreBoardProps)
                 );
               })}
             </div>
-            <div style={{ fontSize: 10, color: "var(--gold)", minWidth: 36, textAlign: "right" }}>
+            <div style={{ fontSize: 10, color: "var(--gold)", textAlign: "right" }}>
               {score}/{totalQuestions}
             </div>
           </div>
