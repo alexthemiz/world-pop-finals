@@ -208,6 +208,14 @@ export default function GameRoom() {
     }, 900);
   }
 
+  async function handleCancelGame() {
+    if (!window.confirm("CANCEL THIS GAME? THIS CANNOT BE UNDONE.")) return;
+    const { error } = await supabase.from("games").delete().eq("id", id).eq("phase", "waiting");
+    if (error) { console.error(error); return; }
+    localStorage.removeItem(storageKey(id));
+    router.push("/");
+  }
+
   async function handlePlayAgain() {
     const current = gameRef.current;
     if (!current || !slot) return;
@@ -298,6 +306,12 @@ export default function GameRoom() {
                 </button>
               )}
             </div>
+            <button
+              onClick={handleCancelGame}
+              style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}
+            >
+              CANCEL GAME
+            </button>
           </div>
         </main>
         <Footer />

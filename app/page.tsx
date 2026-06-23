@@ -468,7 +468,14 @@ function HomeContent() {
                   </button>
                 )}
               </div>
-              <button onClick={() => setWaitingGameId(null)} style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}>
+              <button
+                onClick={async () => {
+                  await supabase.from("games").delete().eq("id", waitingGameId).eq("phase", "waiting");
+                  localStorage.removeItem(`world-pop-finals:${waitingGameId}`);
+                  setWaitingGameId(null);
+                }}
+                style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}
+              >
                 CANCEL
               </button>
               {isPushSupported() ? (
