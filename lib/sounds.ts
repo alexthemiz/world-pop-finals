@@ -57,11 +57,12 @@ function playClip(url: string, offset: number, duration: number) {
       const source = clipCtx.createBufferSource();
       source.buffer = buffer;
       const gain = clipCtx.createGain();
-      const fade = 0.05;
+      const fade = 0.15;
+      const peak = 0.35;
       const t = clipCtx.currentTime;
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(1, t + fade);
-      gain.gain.setValueAtTime(1, t + duration - fade);
+      gain.gain.linearRampToValueAtTime(peak, t + fade);
+      gain.gain.setValueAtTime(peak, t + duration - fade);
       gain.gain.linearRampToValueAtTime(0, t + duration);
       source.connect(gain);
       gain.connect(clipCtx.destination);
