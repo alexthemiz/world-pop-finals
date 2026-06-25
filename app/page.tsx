@@ -458,7 +458,7 @@ function HomeContent() {
               <div style={{ fontSize: 7, background: "var(--panel)", border: "2px solid var(--panel-border)", borderRadius: 6, padding: 12, wordBreak: "break-all", width: "100%" }}>
                 {gameUrl}
               </div>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
                 <button onClick={() => navigator.clipboard.writeText(gameUrl)} style={ctaButtonStyle}>
                   COPY LINK
                 </button>
@@ -467,6 +467,9 @@ function HomeContent() {
                     SHARE
                   </button>
                 )}
+                <button onClick={() => window.open("/?mode=challenge", "_blank")} style={ctaButtonStyle}>
+                  CREATE ANOTHER GAME
+                </button>
               </div>
               <button
                 onClick={async () => {
