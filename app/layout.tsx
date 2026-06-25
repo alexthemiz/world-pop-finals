@@ -9,6 +9,7 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://world-pop-finals.vercel.app"),
   title: "World Pop Finals",
   description: "World Cup 2026 country trivia — penalty shootout style.",
   icons: {
