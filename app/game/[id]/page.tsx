@@ -420,7 +420,12 @@ export default function GameRoom() {
             <Pitch question={currentQuestion} onAnswer={handleAnswer} chosen={chosen} disabled={!!chosen || answering} />
           </>
         ) : (
-          <CenteredMessage>WAITING FOR {oppName.toUpperCase()}...</CenteredMessage>
+          <CenteredMessage>
+            <div>WAITING FOR {oppName.toUpperCase()}...</div>
+            <div style={{ fontSize: 7, color: "var(--text-dim)", marginTop: 10 }}>
+              TEXT {oppName.toUpperCase()} TO LET THEM KNOW IT&apos;S THEIR TURN
+            </div>
+          </CenteredMessage>
         )}
       </main>
       <Footer />
