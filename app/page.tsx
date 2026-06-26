@@ -23,7 +23,7 @@ const FLAG_CODES = [
 ];
 
 function FlagTicker({ direction }: { direction: "left" | "right" }) {
-  const animName = direction === "left" ? "wpf-scroll-left" : "wpf-scroll-right";
+  const animName = direction === "left" ? "tk-scroll-left" : "tk-scroll-right";
   const items = [...FLAG_CODES, ...FLAG_CODES];
   return (
     <div style={{ position: "fixed", left: 0, right: 0, zIndex: 10, overflow: "hidden", background: "rgba(0,0,0,0.7)", borderTop: "1px solid rgba(255,255,255,0.07)", borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "5px 0", ...(direction === "left" ? { top: 0 } : { bottom: 0 }) }}>
@@ -67,7 +67,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"single" | "vs-friend">(() => {
     if (typeof localStorage === "undefined") return "single";
-    const saved = localStorage.getItem("wpf-mode");
+    const saved = localStorage.getItem("tk-mode");
     return saved === "single" || saved === "vs-friend" ? saved : "single";
   });
   const [name, setName] = useState("");
@@ -104,7 +104,7 @@ function HomeContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    localStorage.setItem("wpf-mode", mode);
+    localStorage.setItem("tk-mode", mode);
   }, [mode]);
 
   useEffect(() => {
@@ -210,7 +210,7 @@ function HomeContent() {
     }
   }
 
-  const uuid = typeof localStorage !== "undefined" ? localStorage.getItem("wpf-uuid") ?? "" : "";
+  const uuid = typeof localStorage !== "undefined" ? localStorage.getItem("tk-uuid") ?? "" : "";
   const record = myGames.reduce(
     (acc, g) => {
       const iP1 = g.player1_uuid === uuid;
@@ -229,16 +229,16 @@ function HomeContent() {
   return (
     <>
       <style>{`
-        @keyframes wpf-scroll-left {
+        @keyframes tk-scroll-left {
           0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        @keyframes wpf-scroll-right {
+        @keyframes tk-scroll-right {
           0%   { transform: translateX(-50%); }
           100% { transform: translateX(0); }
         }
         @media (min-width: 768px) {
-          .wpf-main { padding-top: 100px !important; }
+          .tk-main { padding-top: 100px !important; }
         }
       `}</style>
 
@@ -249,7 +249,7 @@ function HomeContent() {
 
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
         <main
-          className="wpf-main"
+          className="tk-main"
           style={{
             flex: 1,
             display: "flex",

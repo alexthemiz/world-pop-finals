@@ -6,10 +6,10 @@ let muted = false;
 export function getMuted() { return muted; }
 export function setMuted(val: boolean) {
   muted = val;
-  if (typeof localStorage !== "undefined") localStorage.setItem("wpf-muted", val ? "1" : "0");
+  if (typeof localStorage !== "undefined") localStorage.setItem("tk-muted", val ? "1" : "0");
 }
 export function initMuted() {
-  if (typeof localStorage !== "undefined") muted = localStorage.getItem("wpf-muted") === "1";
+  if (typeof localStorage !== "undefined") muted = localStorage.getItem("tk-muted") === "1";
 }
 
 function tone(

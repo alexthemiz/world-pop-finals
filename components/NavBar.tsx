@@ -23,11 +23,11 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
   return (
     <>
     <style>{`
-      .wpf-nav-full { display: inline; }
-      .wpf-nav-short { display: none; }
+      .tk-nav-full { display: inline; }
+      .tk-nav-short { display: none; }
       @media (max-width: 480px) {
-        .wpf-nav-full { display: none; }
-        .wpf-nav-short { display: inline; }
+        .tk-nav-full { display: none; }
+        .tk-nav-short { display: inline; }
       }
     `}</style>
     <div
@@ -43,8 +43,8 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
       }}
     >
       <Link href="/" style={{ fontSize: 9, color: "var(--gold)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
-        <span className="wpf-nav-full">◀ TRIVIA KICKS</span>
-        <span className="wpf-nav-short">◀ TK</span>
+        <span className="tk-nav-full">◀ TRIVIA KICKS</span>
+        <span className="tk-nav-short">◀ TK</span>
       </Link>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

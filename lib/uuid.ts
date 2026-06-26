@@ -1,4 +1,4 @@
-const KEY = "wpf-uuid";
+const KEY = "tk-uuid";
 
 export function getOrCreateUUID(): string {
   if (typeof localStorage === "undefined") return "";
