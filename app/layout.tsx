@@ -9,7 +9,7 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://world-pop-finals.vercel.app"),
+  metadataBase: new URL("https://triviakicks.com"),
   title: "Trivia Kicks",
   description: "World Cup 2026 country trivia — penalty shootout style.",
   icons: {
