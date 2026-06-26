@@ -35,27 +35,33 @@ export default function FeedbackButton() {
         onClick={() => setOpen((o) => !o)}
         style={{
           position: "fixed",
-          bottom: 16,
+          bottom: 56,
           right: 16,
           zIndex: 50,
-          fontFamily: "var(--font-press-start), monospace",
-          fontSize: 8,
-          padding: "10px 12px",
+          width: 38,
+          height: 38,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 16,
+          padding: 0,
           background: "var(--panel)",
           border: "2px solid var(--panel-border)",
           color: "var(--text-dim)",
-          borderRadius: 6,
+          borderRadius: "50%",
           cursor: "pointer",
         }}
+        title="Feedback"
+        aria-label="Feedback"
       >
-        💬 FEEDBACK
+        💬
       </button>
 
       {open && (
         <div
           style={{
             position: "fixed",
-            bottom: 64,
+            bottom: 104,
             right: 16,
             zIndex: 50,
             width: 260,
