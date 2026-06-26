@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P } from "next/font/google";
 import "./globals.css";
+import FeedbackButton from "@/components/FeedbackButton";
 
 const pressStart2P = Press_Start_2P({
   variable: "--font-press-start",
@@ -29,7 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={pressStart2P.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <FeedbackButton />
+      </body>
     </html>
   );
 }
