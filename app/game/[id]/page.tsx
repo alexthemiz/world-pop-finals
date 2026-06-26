@@ -18,7 +18,7 @@ import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 type Slot = "player1" | "player2" | null;
 
 function storageKey(id: string) {
-  return `world-pop-finals:${id}`;
+  return `trivia-kicks:${id}`;
 }
 
 export default function GameRoom() {
@@ -299,7 +299,7 @@ export default function GameRoom() {
               </button>
               {typeof navigator !== "undefined" && "share" in navigator && (
                 <button
-                  onClick={() => navigator.share({ title: "World Pop Finals", text: `Join my game on World Pop Finals!`, url: pageUrl })}
+                  onClick={() => navigator.share({ title: "Trivia Kicks", text: `Join my game on Trivia Kicks!`, url: pageUrl })}
                   style={ctaButtonStyle}
                 >
                   SHARE
@@ -353,9 +353,9 @@ export default function GameRoom() {
               <button onClick={handlePlayAgain} style={ctaButtonStyle}>PLAY AGAIN</button>
               <button
                 onClick={() => {
-                  const text = `${result} ${myName.toUpperCase()} ${myScore}–${oppScore} ${oppName.toUpperCase()} · World Pop Finals`;
+                  const text = `${result} ${myName.toUpperCase()} ${myScore}–${oppScore} ${oppName.toUpperCase()} · Trivia Kicks`;
                   if ("share" in navigator) {
-                    (navigator as Navigator & { share: (d: object) => void }).share({ title: "World Pop Finals", text, url: window.location.href });
+                    (navigator as Navigator & { share: (d: object) => void }).share({ title: "Trivia Kicks", text, url: window.location.href });
                   } else {
                     (navigator as Navigator).clipboard.writeText(text);
                   }

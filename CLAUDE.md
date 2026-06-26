@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# World Pop Finals
+# Trivia Kicks
 
 World Cup 2026 country trivia game. Next.js App Router + Supabase + Vercel.
 
@@ -54,4 +54,4 @@ waiting → active → sudden_death → finished
   Uruguay-Cabo Verde fixtures that the original schedule brief listed under
   both Group G and Group H; they live under Group H only.
 - Multiplayer player identity (player1 vs player2) is tracked client-side via
-  localStorage key `world-pop-finals:<gameId>`, set on create/join.
+  localStorage key `trivia-kicks:<gameId>`, set on create/join.

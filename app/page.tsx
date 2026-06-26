@@ -199,7 +199,7 @@ function HomeContent() {
       });
       if (insertError) throw insertError;
       supabase.rpc("increment_games_played").then(({ error }) => { if (error) console.error(error); });
-      localStorage.setItem(`world-pop-finals:${id}`, "player1");
+      localStorage.setItem(`trivia-kicks:${id}`, "player1");
       setWaitingGameId(id);
       setGameUrl(`${window.location.origin}/game/${id}`);
     } catch (e) {
@@ -273,7 +273,7 @@ function HomeContent() {
                 textShadow: "0 0 20px rgba(255,200,0,0.4)",
               }}
             >
-              WORLD POP FINALS
+              TRIVIA KICKS
             </h1>
             <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
               COUNTRY TRIVIA SHOOTOUT
@@ -463,7 +463,7 @@ function HomeContent() {
                   COPY LINK
                 </button>
                 {typeof navigator !== "undefined" && "share" in navigator && (
-                  <button onClick={() => navigator.share({ title: "World Pop Finals", text: `Join my game!`, url: gameUrl })} style={ctaButtonStyle}>
+                  <button onClick={() => navigator.share({ title: "Trivia Kicks", text: `Join my game!`, url: gameUrl })} style={ctaButtonStyle}>
                     SHARE
                   </button>
                 )}
@@ -474,7 +474,7 @@ function HomeContent() {
               <button
                 onClick={async () => {
                   await supabase.from("games").delete().eq("id", waitingGameId).eq("phase", "waiting");
-                  localStorage.removeItem(`world-pop-finals:${waitingGameId}`);
+                  localStorage.removeItem(`trivia-kicks:${waitingGameId}`);
                   setWaitingGameId(null);
                 }}
                 style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", marginTop: 4 }}

@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const matchup = await getMatchup(id);
   const title = matchup
-    ? `${matchup.home.toUpperCase()} vs ${matchup.away.toUpperCase()} — World Pop Finals`
-    : "World Pop Finals";
+    ? `${matchup.home.toUpperCase()} vs ${matchup.away.toUpperCase()} — Trivia Kicks`
+    : "Trivia Kicks";
   const description = matchup
     ? `Join the country trivia shootout: ${matchup.home} vs ${matchup.away}!`
     : "Country trivia shootout — World Cup 2026";

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "World Pop Finals";
+export const alt = "Trivia Kicks";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -22,7 +22,7 @@ export default function Image() {
       >
         <div style={{ fontSize: 160, lineHeight: 1 }}>⚽</div>
         <div style={{ color: "#f5c518", fontSize: 72, fontWeight: "bold", letterSpacing: 4 }}>
-          WORLD POP FINALS
+          TRIVIA KICKS
         </div>
         <div style={{ color: "#666", fontSize: 28, letterSpacing: 6 }}>
           COUNTRY TRIVIA SHOOTOUT

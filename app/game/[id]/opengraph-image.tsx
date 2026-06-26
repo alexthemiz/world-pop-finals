@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { ISO_CODES } from "@/lib/countries";
 
 export const runtime = "edge";
-export const alt = "World Pop Finals matchup";
+export const alt = "Trivia Kicks matchup";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -56,7 +56,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           <div style={{ fontSize: 160, lineHeight: 1, display: "flex" }}>⚽</div>
         )}
         <div style={{ color: "#f5c518", fontSize: 40, fontWeight: "bold", letterSpacing: 4, display: "flex" }}>
-          WORLD POP FINALS
+          TRIVIA KICKS
         </div>
       </div>
     ),

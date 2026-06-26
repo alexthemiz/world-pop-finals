@@ -70,15 +70,15 @@ Deno.serve(async (req) => {
 
   if (old_record.phase === "waiting" && record.phase === "active") {
     for (const sub of bySlot("player1")) {
-      await sendTo(record.id, sub, { title: "World Pop Finals", body: `${record.player1_name ?? "Someone"}'s opponent joined! Time to play.`, url });
+      await sendTo(record.id, sub, { title: "Trivia Kicks", body: `${record.player1_name ?? "Someone"}'s opponent joined! Time to play.`, url });
     }
   } else if (record.phase === "sudden_death") {
     for (const sub of subs) {
-      await sendTo(record.id, sub, { title: "World Pop Finals", body: "Sudden death! A tiebreaker question was added.", url });
+      await sendTo(record.id, sub, { title: "Trivia Kicks", body: "Sudden death! A tiebreaker question was added.", url });
     }
   } else if (record.phase === "finished") {
     for (const sub of subs) {
-      await sendTo(record.id, sub, { title: "World Pop Finals", body: "Final result is in — tap to see who won!", url });
+      await sendTo(record.id, sub, { title: "Trivia Kicks", body: "Final result is in — tap to see who won!", url });
     }
   }
 

@@ -43,8 +43,8 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
       }}
     >
       <Link href="/" style={{ fontSize: 9, color: "var(--gold)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
-        <span className="wpf-nav-full">◀ WORLD POP FINALS</span>
-        <span className="wpf-nav-short">◀ WPF</span>
+        <span className="wpf-nav-full">◀ TRIVIA KICKS</span>
+        <span className="wpf-nav-short">◀ TK</span>
       </Link>
 
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

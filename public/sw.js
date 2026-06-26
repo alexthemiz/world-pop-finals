@@ -1,5 +1,5 @@
 self.addEventListener("push", (event) => {
-  let data = { title: "World Pop Finals", body: "Something happened in your game.", url: "/" };
+  let data = { title: "Trivia Kicks", body: "Something happened in your game.", url: "/" };
   try {
     if (event.data) data = { ...data, ...event.data.json() };
   } catch (e) {
