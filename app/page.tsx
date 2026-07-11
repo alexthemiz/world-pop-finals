@@ -68,9 +68,9 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"single" | "vs-friend">(() => {
-    if (typeof localStorage === "undefined") return "single";
+    if (typeof localStorage === "undefined") return "vs-friend";
     const saved = localStorage.getItem("tk-mode");
-    return saved === "single" || saved === "vs-friend" ? saved : "single";
+    return saved === "single" || saved === "vs-friend" ? saved : "vs-friend";
   });
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -357,7 +357,7 @@ function HomeContent() {
               overflow: "hidden",
             }}
           >
-            {(["single", "vs-friend"] as const).map((m) => (
+            {(["vs-friend", "single"] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => { setMode(m); setError(null); }}

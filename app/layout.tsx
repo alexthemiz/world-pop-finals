@@ -12,13 +12,13 @@ const pressStart2P = Press_Start_2P({
 export const metadata: Metadata = {
   metadataBase: new URL("https://triviakicks.com"),
   title: "Trivia Kicks",
-  description: "World Cup 2026 country trivia — penalty shootout style.",
+  description: "Country trivia — penalty shootout style.",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>",
   },
   openGraph: {
     title: "Trivia Kicks",
-    description: "Country trivia shootout — World Cup 2026",
+    description: "Country trivia shootout",
     images: [{ url: "/og.png", width: 1200, height: 630 }],
   },
 };

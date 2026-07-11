@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     : "Trivia Kicks";
   const description = matchup
     ? `Join the country trivia shootout: ${matchup.home} vs ${matchup.away}!`
-    : "Country trivia shootout — World Cup 2026";
+    : "Country trivia shootout";
   return {
     title,
     description,
