@@ -384,7 +384,7 @@ function HomeContent() {
               RANDOM
             </button>
 
-            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A KNOCKOUT MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A KNOCKOUT ROUND MATCH</label>
             <select
               value={pickedKnockout}
               onChange={(e) => selectKnockout(e.target.value)}
