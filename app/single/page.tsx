@@ -8,7 +8,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import QuestionReview from "@/components/QuestionReview";
 import { generateQuestions, type Question } from "@/lib/questions";
-import { getAllMatchPairs } from "@/lib/matches";
+import { getAllCountryPairs } from "@/lib/matches";
 import { SOURCES } from "@/lib/countries";
 import { playCorrect, playWrong, playWin, playLose } from "@/lib/sounds";
 import { supabase } from "@/lib/supabase";
@@ -25,11 +25,8 @@ function SinglePlayerContent() {
   useEffect(() => {
     const home = searchParams.get("home");
     const away = searchParams.get("away");
-    const allPairs = getAllMatchPairs();
-    const matchList = home && away
-      ? allPairs.filter((p) => (p.home === home && p.away === away) || (p.home === away && p.away === home))
-      : allPairs;
-    setQuestions(generateQuestions(matchList.length > 0 ? matchList : allPairs));
+    const matchList = home && away ? [{ home, away, group: "" }] : getAllCountryPairs();
+    setQuestions(generateQuestions(matchList));
     supabase.rpc("increment_games_played").then(({ error }) => { if (error) console.error(error); });
   }, [searchParams]);
 

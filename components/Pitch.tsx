@@ -181,18 +181,20 @@ export default function Pitch({ question, onAnswer, chosen, disabled }: PitchPro
         }}
       >
         <FlagLabel country={question.home} />
-        <div
-          style={{
-            background: "rgba(0,0,0,0.6)",
-            color: "var(--gold)",
-            fontSize: 8,
-            padding: "4px 6px",
-            borderRadius: 4,
-            border: "1px solid var(--gold)",
-          }}
-        >
-          GROUP {question.group}
-        </div>
+        {question.group && (
+          <div
+            style={{
+              background: "rgba(0,0,0,0.6)",
+              color: "var(--gold)",
+              fontSize: 8,
+              padding: "4px 6px",
+              borderRadius: 4,
+              border: "1px solid var(--gold)",
+            }}
+          >
+            {question.group.length === 1 ? `GROUP ${question.group}` : question.group.toUpperCase()}
+          </div>
+        )}
         <FlagLabel country={question.away} reverse />
       </div>
 

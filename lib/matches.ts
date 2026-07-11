@@ -6,6 +6,9 @@
 // correction (Group H = Spain/Saudi Arabia/Uruguay/Cabo Verde), the G-labeled
 // duplicates have been removed so each match appears exactly once.
 
+import { COUNTRIES } from "./countries";
+import { KNOCKOUT_MATCHES } from "./knockoutMatches";
+
 export interface Match {
   group: string;
   home: string;
@@ -14,6 +17,10 @@ export interface Match {
   time: string;
   venue: string;
   result: string | null;
+  /** Set when the match (result) was a draw decided on penalties. */
+  penaltyWinner?: string;
+  /** "4-3" format, winner's score first. */
+  penaltyScore?: string;
 }
 
 export const MATCHES: Match[] = [
@@ -122,7 +129,7 @@ export interface MatchInfo {
 }
 
 export function getMatchInfo(home: string, away: string): MatchInfo | null {
-  const match = MATCHES.find(
+  const match = [...MATCHES, ...KNOCKOUT_MATCHES].find(
     (m) => (m.home === home && m.away === away) || (m.home === away && m.away === home)
   );
   if (!match) return null;
@@ -130,14 +137,13 @@ export function getMatchInfo(home: string, away: string): MatchInfo | null {
   if (match.result) {
     const [hGoals, aGoals] = match.result.split("-");
     const flipped = match.home !== home;
-    return {
-      type: "result",
-      text: flipped
-        ? `FINAL: ${away} ${aGoals}-${hGoals} ${home}`
-        : `FINAL: ${home} ${hGoals}-${aGoals} ${away}`,
-      venue: match.venue,
-      date: match.date,
-    };
+    let text = flipped
+      ? `FINAL: ${away} ${aGoals}-${hGoals} ${home}`
+      : `FINAL: ${home} ${hGoals}-${aGoals} ${away}`;
+    if (match.penaltyWinner && match.penaltyScore) {
+      text += ` (${match.penaltyWinner.toUpperCase()} WON ${match.penaltyScore} ON PENS)`;
+    }
+    return { type: "result", text, venue: match.venue, date: match.date };
   }
 
   return {
@@ -151,4 +157,16 @@ export function getMatchInfo(home: string, away: string): MatchInfo | null {
 /** All unique {home, away, group} fixtures, used as the pool for question generation. */
 export function getAllMatchPairs(): { home: string; away: string; group: string }[] {
   return MATCHES.map(({ home, away, group }) => ({ home, away, group }));
+}
+
+/** Every possible pairing among the 48 nations — used for true "random" (not limited to scheduled fixtures). */
+export function getAllCountryPairs(): { home: string; away: string; group: string }[] {
+  const names = Object.keys(COUNTRIES);
+  const pairs: { home: string; away: string; group: string }[] = [];
+  for (let i = 0; i < names.length; i++) {
+    for (let j = i + 1; j < names.length; j++) {
+      pairs.push({ home: names[i], away: names[j], group: "" });
+    }
+  }
+  return pairs;
 }

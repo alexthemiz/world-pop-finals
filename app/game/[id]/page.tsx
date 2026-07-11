@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions, generateSuddenDeathQuestion } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
-import { getAllMatchPairs } from "@/lib/matches"; // still needed for generateQuestions on game create / play again
+import { getAllCountryPairs } from "@/lib/matches"; // still needed for generateQuestions on play again
 import { SOURCES } from "@/lib/countries";
 import Pitch from "@/components/Pitch";
 import ScoreBoard from "@/components/ScoreBoard";
@@ -221,7 +221,7 @@ export default function GameRoom() {
     if (!current || !slot) return;
     const myName = slot === "player1" ? current.player1_name : current.player2_name;
     const newId = Math.random().toString(36).slice(2, 9);
-    const questions = generateQuestions(getAllMatchPairs(), new Set(), 5);
+    const questions = generateQuestions(getAllCountryPairs(), new Set(), 5);
     const { error } = await supabase.from("games").insert({
       id: newId, questions, player1_name: myName ?? "PLAYER 1", phase: "waiting", round: 1,
     });

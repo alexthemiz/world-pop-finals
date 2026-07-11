@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
-import { getAllMatchPairs } from "@/lib/matches";
+import { getAllMatchPairs, getAllCountryPairs } from "@/lib/matches";
+import { getAllKnockoutPairs, KNOCKOUT_ROUNDS } from "@/lib/knockoutMatches";
+import { COUNTRIES } from "@/lib/countries";
 import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 import Footer from "@/components/Footer";
 
@@ -74,7 +76,14 @@ function HomeContent() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [myGames, setMyGames] = useState<GameRow[]>([]);
-  const [pickedMatch, setPickedMatch] = useState("");
+  // Not restored from localStorage on load: the underlying selection (which
+  // knockout match, which countries) isn't persisted, so restoring only the
+  // mode would show an "active" picker with nothing actually picked.
+  const [pickerMode, setPickerMode] = useState<"random" | "knockout" | "group" | "custom">("random");
+  const [pickedKnockout, setPickedKnockout] = useState("");
+  const [pickedGroupMatch, setPickedGroupMatch] = useState("");
+  const [customHome, setCustomHome] = useState("");
+  const [customAway, setCustomAway] = useState("");
   const [waitingGameId, setWaitingGameId] = useState<string | null>(null);
   const [gameUrl, setGameUrl] = useState("");
   const [gamesPlayed, setGamesPlayed] = useState<number | null>(null);
@@ -82,6 +91,9 @@ function HomeContent() {
   const [outstandingGames, setOutstandingGames] = useState<GameRow[]>([]);
 
   const allPairs = getAllMatchPairs();
+  const knockoutPairs = getAllKnockoutPairs();
+  const allCountryPairs = getAllCountryPairs();
+  const countryNames = Object.keys(COUNTRIES).sort();
 
   const groupedMatches: Record<string, typeof allPairs> = {};
   allPairs.forEach((p) => {
@@ -90,13 +102,63 @@ function HomeContent() {
   });
   const groups = Object.keys(groupedMatches).sort();
 
+  const groupedKnockout: Record<string, typeof knockoutPairs> = {};
+  knockoutPairs.forEach((p) => {
+    if (!groupedKnockout[p.group]) groupedKnockout[p.group] = [];
+    groupedKnockout[p.group].push(p);
+  });
+
   function getMatchPairs() {
-    if (pickedMatch) {
-      const [home, away] = pickedMatch.split("|");
+    if (pickerMode === "knockout" && pickedKnockout) {
+      const [home, away] = pickedKnockout.split("|");
+      const pair = knockoutPairs.find((p) => p.home === home && p.away === away);
+      if (pair) return [pair];
+    } else if (pickerMode === "group" && pickedGroupMatch) {
+      const [home, away] = pickedGroupMatch.split("|");
       const pair = allPairs.find((p) => p.home === home && p.away === away);
-      return pair ? [pair] : allPairs;
+      if (pair) return [pair];
+    } else if (pickerMode === "custom" && customHome && customAway) {
+      return [{ home: customHome, away: customAway, group: "" }];
     }
-    return allPairs;
+    return allCountryPairs;
+  }
+
+  function selectRandom() {
+    setPickerMode("random");
+    setPickedKnockout("");
+    setPickedGroupMatch("");
+    setCustomHome("");
+    setCustomAway("");
+  }
+
+  function selectKnockout(value: string) {
+    setPickedKnockout(value);
+    setPickedGroupMatch("");
+    setCustomHome("");
+    setCustomAway("");
+    setPickerMode(value ? "knockout" : "random");
+  }
+
+  function selectGroupMatch(value: string) {
+    setPickedGroupMatch(value);
+    setPickedKnockout("");
+    setCustomHome("");
+    setCustomAway("");
+    setPickerMode(value ? "group" : "random");
+  }
+
+  function selectCustomHome(value: string) {
+    setCustomHome(value);
+    setPickedKnockout("");
+    setPickedGroupMatch("");
+    setPickerMode("custom");
+  }
+
+  function selectCustomAway(value: string) {
+    setCustomAway(value);
+    setPickedKnockout("");
+    setPickedGroupMatch("");
+    setPickerMode("custom");
   }
 
   useEffect(() => {
@@ -316,16 +378,35 @@ function HomeContent() {
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 340 }}>
             <button
-              onClick={() => setPickedMatch("")}
-              style={{ fontSize: 8, padding: "10px 24px", background: !pickedMatch ? "var(--gold)" : "var(--panel)", color: !pickedMatch ? "#000" : "var(--text-dim)", border: `2px solid ${!pickedMatch ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
+              onClick={selectRandom}
+              style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
             >
               RANDOM
             </button>
-            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A MATCH</label>
+
+            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A KNOCKOUT MATCH</label>
             <select
-              value={pickedMatch}
-              onChange={(e) => setPickedMatch(e.target.value)}
-              style={{ fontFamily: "var(--font-press-start), monospace", fontSize: 7, padding: "9px 10px", background: "#0a0e14", border: `2px solid ${pickedMatch ? "var(--gold)" : "var(--panel-border)"}`, color: "var(--text)", borderRadius: 4, width: "100%", cursor: "pointer" }}
+              value={pickedKnockout}
+              onChange={(e) => selectKnockout(e.target.value)}
+              style={pickerSelectStyle(pickerMode === "knockout")}
+            >
+              <option value="">— SELECT A KNOCKOUT MATCH —</option>
+              {KNOCKOUT_ROUNDS.map((round) => (
+                <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
+                  {(groupedKnockout[round] ?? []).map((p) => (
+                    <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
+                      {p.home.toUpperCase()} vs {p.away.toUpperCase()}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+
+            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A GROUP STAGE MATCH</label>
+            <select
+              value={pickedGroupMatch}
+              onChange={(e) => selectGroupMatch(e.target.value)}
+              style={pickerSelectStyle(pickerMode === "group")}
             >
               <option value="">— SELECT A MATCH —</option>
               {groups.map((g) => (
@@ -338,18 +419,46 @@ function HomeContent() {
                 </optgroup>
               ))}
             </select>
+
+            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK THE TWO COUNTRIES</label>
+            <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
+              <select
+                value={customHome}
+                onChange={(e) => selectCustomHome(e.target.value)}
+                style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
+              >
+                <option value="">— COUNTRY 1 —</option>
+                {countryNames.filter((c) => c !== customAway).map((c) => (
+                  <option key={c} value={c}>{c.toUpperCase()}</option>
+                ))}
+              </select>
+              <select
+                value={customAway}
+                onChange={(e) => selectCustomAway(e.target.value)}
+                style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
+              >
+                <option value="">— COUNTRY 2 —</option>
+                {countryNames.filter((c) => c !== customHome).map((c) => (
+                  <option key={c} value={c}>{c.toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Single player */}
           {mode === "single" && (
             <button
               onClick={() => {
-                if (pickedMatch) {
-                  const [home, away] = pickedMatch.split("|");
-                  router.push(`/single?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`);
-                } else {
-                  router.push("/single");
+                // getMatchPairs() falls back to the full random pool when the
+                // current picker mode doesn't have a complete selection yet —
+                // only route with home/away when it resolved to one specific pair.
+                const pairs = getMatchPairs();
+                if (pickerMode !== "random" && pairs.length === 1) {
+                  const pair = pairs[0];
+                  router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
+                  return;
                 }
+                router.push("/single");
               }}
               style={ctaButtonStyle}
             >
@@ -519,6 +628,20 @@ export default function Home() {
       <HomeContent />
     </Suspense>
   );
+}
+
+function pickerSelectStyle(active: boolean): CSSProperties {
+  return {
+    fontFamily: "var(--font-press-start), monospace",
+    fontSize: 7,
+    padding: "9px 10px",
+    background: "#0a0e14",
+    border: `2px solid ${active ? "var(--gold)" : "var(--panel-border)"}`,
+    color: "var(--text)",
+    borderRadius: 4,
+    width: "100%",
+    cursor: "pointer",
+  };
 }
 
 const ctaButtonStyle: CSSProperties = {
