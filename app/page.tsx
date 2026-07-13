@@ -64,22 +64,6 @@ function PitchBackground() {
   );
 }
 
-function StepRow({ number, label, children }: { number: number; label: string; children: React.ReactNode }) {
-  return (
-    <div className="tk-step-row" style={{ position: "relative", display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
-      <div className="tk-step-label" style={{ fontSize: 8, color: "var(--text)", textAlign: "left" }}>
-        {number}. {label}
-      </div>
-      {/* Centered independently of the label so equal-width pairs inside
-          (Versus/Single, Knockout/Group, Country 1/2) split exactly on
-          the pitch's halfway line, regardless of the label's width. */}
-      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function Bracket({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ position: "relative", paddingLeft: 14, display: "flex", flexDirection: "column", gap: 14 }}>
@@ -329,16 +313,6 @@ function HomeContent() {
         @media (min-width: 768px) {
           .tk-main { padding-top: 48px !important; }
         }
-        @media (min-width: 600px) {
-          .tk-step-row { padding-top: 20px !important; }
-          .tk-step-label {
-            position: absolute !important;
-            right: calc(50% + 16px) !important;
-            top: 0 !important;
-            width: 240px !important;
-            text-align: right !important;
-          }
-        }
       `}</style>
 
       <PitchBackground />
@@ -379,41 +353,39 @@ function HomeContent() {
             </p>
           </div>
 
-          <StepRow number={1} label="PICK A MODE">
-            <div
-              style={{
-                display: "flex",
-                background: "var(--panel)",
-                border: "3px solid var(--panel-border)",
-                borderRadius: 6,
-                overflow: "hidden",
-                width: "fit-content",
-              }}
-            >
-              {(["vs-friend", "single"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => { setMode(m); setError(null); }}
-                  style={{
-                    fontSize: 9,
-                    padding: "12px 20px",
-                    width: 170,
-                    whiteSpace: "nowrap",
-                    background: mode === m ? "var(--gold)" : "transparent",
-                    color: mode === m ? "#000" : "var(--text-dim)",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  {m === "single" ? "SINGLE PLAYER" : "VERSUS"}
-                </button>
-              ))}
-            </div>
-          </StepRow>
+          {/* Mode toggle */}
+          <div
+            style={{
+              display: "flex",
+              background: "var(--panel)",
+              border: "3px solid var(--panel-border)",
+              borderRadius: 6,
+              overflow: "hidden",
+            }}
+          >
+            {(["vs-friend", "single"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setError(null); }}
+                style={{
+                  fontSize: 9,
+                  padding: "12px 20px",
+                  width: 170,
+                  whiteSpace: "nowrap",
+                  background: mode === m ? "var(--gold)" : "transparent",
+                  color: mode === m ? "#000" : "var(--text-dim)",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                {m === "single" ? "SINGLE PLAYER" : "VERSUS"}
+              </button>
+            ))}
+          </div>
 
-          {/* Outstanding challenges (not a numbered step) */}
+          {/* Outstanding challenges */}
           {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
-            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 720 }}>
+            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
               <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
                 OUTSTANDING CHALLENGES
               </div>
@@ -453,32 +425,11 @@ function HomeContent() {
             </div>
           )}
 
-          {/* Step 2: Enter your name (Versus mode only) */}
-          {mode === "vs-friend" && !waitingGameId && (
-            <StepRow number={2} label="ENTER YOUR NAME">
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="PLAYER 1"
-                maxLength={16}
-                style={{
-                  fontFamily: "var(--font-press-start), monospace",
-                  fontSize: 10,
-                  padding: 10,
-                  background: "#0a0e14",
-                  border: "2px solid var(--panel-border)",
-                  color: "var(--text)",
-                  borderRadius: 4,
-                  width: 140,
-                }}
-              />
-            </StepRow>
-          )}
-
-          <StepRow number={mode === "vs-friend" ? 3 : 2} label="PICK THE COUNTRIES">
+          {/* Match picker */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
             <Bracket>
               <div>
-                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>SELECT A SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={pickedKnockout}
@@ -516,7 +467,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>OR: TWO 2026 PARTICIPANTS OF YOUR CHOICE</div>
+                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>OR PICK TWO 2026 NATIONS OF YOUR CHOICE</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -551,32 +502,51 @@ function HomeContent() {
                 </button>
               </div>
             </Bracket>
-          </StepRow>
+          </div>
 
+          {/* Single player */}
           {mode === "single" && (
-            <StepRow number={3} label="PLAY">
-              <button
-                onClick={() => {
-                  // getMatchPairs() falls back to the full random pool when the
-                  // current picker mode doesn't have a complete selection yet —
-                  // only route with home/away when it resolved to one specific pair.
-                  const pairs = getMatchPairs();
-                  if (pickerMode !== "random" && pairs.length === 1) {
-                    const pair = pairs[0];
-                    router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
-                    return;
-                  }
-                  router.push("/single");
-                }}
-                style={ctaButtonStyle}
-              >
-                PLAY
-              </button>
-            </StepRow>
+            <button
+              onClick={() => {
+                // getMatchPairs() falls back to the full random pool when the
+                // current picker mode doesn't have a complete selection yet —
+                // only route with home/away when it resolved to one specific pair.
+                const pairs = getMatchPairs();
+                if (pickerMode !== "random" && pairs.length === 1) {
+                  const pair = pairs[0];
+                  router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
+                  return;
+                }
+                router.push("/single");
+              }}
+              style={ctaButtonStyle}
+            >
+              PLAY
+            </button>
           )}
 
+          {/* Enter name + create game (Versus mode only) */}
           {mode === "vs-friend" && !waitingGameId && (
-            <StepRow number={4} label="CREATE GAME">
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
+                ENTER YOUR NAME
+              </label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="PLAYER 1"
+                maxLength={16}
+                style={{
+                  fontFamily: "var(--font-press-start), monospace",
+                  fontSize: 10,
+                  padding: 10,
+                  background: "#0a0e14",
+                  border: "2px solid var(--panel-border)",
+                  color: "var(--text)",
+                  borderRadius: 4,
+                  width: 140,
+                }}
+              />
               <button
                 onClick={handleCreateGame}
                 disabled={creating}
@@ -584,13 +554,11 @@ function HomeContent() {
               >
                 {creating ? "..." : "CREATE GAME LINK"}
               </button>
-            </StepRow>
-          )}
-          {mode === "vs-friend" && !waitingGameId && error && (
-            <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>
+              {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
+            </div>
           )}
           {mode === "vs-friend" && !waitingGameId && myGames.length > 0 && (
-            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 720 }}>
+            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
               <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
                 YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
               </div>
