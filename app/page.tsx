@@ -300,7 +300,7 @@ function HomeContent() {
           100% { transform: translateX(0); }
         }
         @media (min-width: 768px) {
-          .tk-main { padding-top: 100px !important; }
+          .tk-main { padding-top: 48px !important; }
         }
       `}</style>
 
@@ -319,9 +319,9 @@ function HomeContent() {
             alignItems: "center",
             justifyContent: "flex-start",
             padding: "24px 24px",
-            paddingTop: 58,
-            paddingBottom: 58,
-            gap: 28,
+            paddingTop: 32,
+            paddingBottom: 32,
+            gap: 18,
             textAlign: "center",
           }}
         >
@@ -376,7 +376,7 @@ function HomeContent() {
           </div>
 
           {/* Match picker */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 340 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 440 }}>
             <button
               onClick={selectRandom}
               style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
@@ -384,43 +384,43 @@ function HomeContent() {
               RANDOM COUNTRIES
             </button>
 
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK A KNOCKOUT ROUND MATCH</label>
-            <select
-              value={pickedKnockout}
-              onChange={(e) => selectKnockout(e.target.value)}
-              style={pickerSelectStyle(pickerMode === "knockout")}
-            >
-              <option value="">— SELECT A KNOCKOUT MATCH —</option>
-              {KNOCKOUT_ROUNDS.map((round) => (
-                <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
-                  {(groupedKnockout[round] ?? []).map((p) => (
-                    <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                      {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR PICK A SPECIFIC MATCH</label>
+            <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
+              <select
+                value={pickedKnockout}
+                onChange={(e) => selectKnockout(e.target.value)}
+                style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
+              >
+                <option value="">— KNOCKOUT MATCH —</option>
+                {KNOCKOUT_ROUNDS.map((round) => (
+                  <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
+                    {(groupedKnockout[round] ?? []).map((p) => (
+                      <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
+                        {p.home.toUpperCase()} vs {p.away.toUpperCase()}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <select
+                value={pickedGroupMatch}
+                onChange={(e) => selectGroupMatch(e.target.value)}
+                style={{ ...pickerSelectStyle(pickerMode === "group"), width: "calc(50% - 4px)", minWidth: 140 }}
+              >
+                <option value="">— GROUP MATCH —</option>
+                {groups.map((g) => (
+                  <optgroup key={g} label={`── GROUP ${g} ──`}>
+                    {groupedMatches[g].map((p) => (
+                      <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
+                        {p.home.toUpperCase()} vs {p.away.toUpperCase()}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
 
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK A GROUP STAGE MATCH</label>
-            <select
-              value={pickedGroupMatch}
-              onChange={(e) => selectGroupMatch(e.target.value)}
-              style={pickerSelectStyle(pickerMode === "group")}
-            >
-              <option value="">— SELECT A MATCH —</option>
-              {groups.map((g) => (
-                <optgroup key={g} label={`── GROUP ${g} ──`}>
-                  {groupedMatches[g].map((p) => (
-                    <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                      {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK THE TWO COUNTRIES</label>
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR PICK THE TWO COUNTRIES</label>
             <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
               <select
                 value={customHome}
