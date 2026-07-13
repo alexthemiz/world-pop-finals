@@ -337,7 +337,7 @@ function HomeContent() {
             >
               TRIVIA KICKS
             </h1>
-            <p style={{ fontSize: 9, color: "var(--text-dim)", marginTop: 10 }}>
+            <p style={{ fontSize: 9, color: "var(--text)", marginTop: 10 }}>
               COUNTRY TRIVIA SHOOTOUT
             </p>
             {gamesPlayed !== null && (
@@ -510,7 +510,7 @@ function HomeContent() {
                   })}
                 </div>
               )}
-              <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
+              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
                 ENTER YOUR NAME
               </label>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
