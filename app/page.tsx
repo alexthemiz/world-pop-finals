@@ -347,6 +347,8 @@ function HomeContent() {
             )}
           </div>
 
+          <label style={{ fontSize: 8, color: "var(--text)" }}>1. PICK A MODE</label>
+
           {/* Mode toggle */}
           <div
             style={{
@@ -374,6 +376,8 @@ function HomeContent() {
               </button>
             ))}
           </div>
+
+          <label style={{ fontSize: 8, color: "var(--text)" }}>2. PICK THE COUNTRIES</label>
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 440 }}>
@@ -446,6 +450,10 @@ function HomeContent() {
             </button>
           </div>
 
+          {mode === "single" && (
+            <label style={{ fontSize: 8, color: "var(--text)" }}>3. PLAY</label>
+          )}
+
           {/* Single player */}
           {mode === "single" && (
             <button
@@ -511,7 +519,10 @@ function HomeContent() {
                 </div>
               )}
               <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
-                ENTER YOUR NAME
+                3. ENTER YOUR NAME
+              </label>
+              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
+                4. CREATE GAME
               </label>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <input
