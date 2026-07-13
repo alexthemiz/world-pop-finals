@@ -1,6 +1,8 @@
-// World Cup 2026 knockout stage. Round of 32 and Round of 16 are complete;
-// later rounds (quarterfinals onward) aren't added yet since they were still
-// in progress as of the last data pull — add them once fully resolved.
+// World Cup 2026 knockout stage. Round of 32, Round of 16, and Quarterfinals
+// are complete. Semifinal matchups are set (from QF winners) but those
+// games haven't been played yet, so they carry no result. Third place and
+// Final aren't added yet since the semifinal winners aren't known — add
+// them once the semifinals are resolved.
 //
 // Kickoff times are approximate slot times, not verified to the minute —
 // dates, matchups, venues, and scores are the parts that were cross-checked
@@ -8,7 +10,7 @@
 
 import type { Match } from "./matches";
 
-export const KNOCKOUT_ROUNDS = ["Round of 32", "Round of 16"];
+export const KNOCKOUT_ROUNDS = ["Round of 32", "Round of 16", "Quarterfinals", "Semifinals"];
 
 export const KNOCKOUT_MATCHES: Match[] = [
   // ROUND OF 32
@@ -38,6 +40,16 @@ export const KNOCKOUT_MATCHES: Match[] = [
   { group: "Round of 16", home: "Belgium", away: "USA", date: "Mon Jul 6", time: "8:00 PM ET", venue: "Lumen Field, Seattle", result: "4-1" },
   { group: "Round of 16", home: "Argentina", away: "Egypt", date: "Tue Jul 7", time: "4:00 PM ET", venue: "Mercedes-Benz Stadium, Atlanta", result: "3-2" },
   { group: "Round of 16", home: "Switzerland", away: "Colombia", date: "Tue Jul 7", time: "8:00 PM ET", venue: "BC Place, Vancouver", result: "0-0", penaltyWinner: "Switzerland", penaltyScore: "4-3" },
+
+  // QUARTERFINALS
+  { group: "Quarterfinals", home: "France", away: "Morocco", date: "Thu Jul 9", time: "4:00 PM ET", venue: "Gillette Stadium, Boston", result: "2-0" },
+  { group: "Quarterfinals", home: "Spain", away: "Belgium", date: "Fri Jul 10", time: "3:00 PM ET", venue: "SoFi Stadium, Los Angeles", result: "2-1" },
+  { group: "Quarterfinals", home: "England", away: "Norway", date: "Sat Jul 11", time: "5:00 PM ET", venue: "Hard Rock Stadium, Miami", result: "2-1" },
+  { group: "Quarterfinals", home: "Argentina", away: "Switzerland", date: "Sat Jul 11", time: "8:00 PM ET", venue: "Arrowhead Stadium, Kansas City", result: "3-1" },
+
+  // SEMIFINALS (matchups set, not yet played)
+  { group: "Semifinals", home: "France", away: "Spain", date: "Tue Jul 14", time: "3:00 PM ET", venue: "AT&T Stadium, Dallas", result: null },
+  { group: "Semifinals", home: "England", away: "Argentina", date: "Wed Jul 15", time: "3:00 PM ET", venue: "Mercedes-Benz Stadium, Atlanta", result: null },
 ];
 
 /** All knockout {home, away, group} pairs, grouped by round for the picker dropdown. */
