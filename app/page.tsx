@@ -66,11 +66,14 @@ function PitchBackground() {
 
 function StepRow({ number, label, children }: { number: number; label: string; children: React.ReactNode }) {
   return (
-    <div className="tk-step-row" style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxWidth: 720 }}>
+    <div className="tk-step-row" style={{ position: "relative", display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
       <div className="tk-step-label" style={{ fontSize: 8, color: "var(--text)", textAlign: "left" }}>
         {number}. {label}
       </div>
-      <div style={{ minWidth: 0, textAlign: "left" }}>
+      {/* Centered independently of the label so equal-width pairs inside
+          (Versus/Single, Knockout/Group, Country 1/2) split exactly on
+          the pitch's halfway line, regardless of the label's width. */}
+      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
         {children}
       </div>
     </div>
@@ -327,8 +330,14 @@ function HomeContent() {
           .tk-main { padding-top: 48px !important; }
         }
         @media (min-width: 600px) {
-          .tk-step-row { display: grid !important; grid-template-columns: 1fr 1fr !important; align-items: center !important; }
-          .tk-step-label { text-align: right !important; }
+          .tk-step-label {
+            position: absolute !important;
+            right: calc(50% + 16px) !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 240px !important;
+            text-align: right !important;
+          }
         }
       `}</style>
 
