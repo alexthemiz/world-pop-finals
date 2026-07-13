@@ -66,10 +66,13 @@ function PitchBackground() {
 
 function Bracket({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ position: "relative", paddingLeft: 14, display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ position: "absolute", left: 0, top: 4, bottom: 4, borderLeft: "2px solid var(--panel-border)" }} />
-      <div style={{ position: "absolute", left: 0, top: 4, width: 8, height: 2, background: "var(--panel-border)" }} />
-      <div style={{ position: "absolute", left: 0, bottom: 4, width: 8, height: 2, background: "var(--panel-border)" }} />
+    <div style={{ position: "relative", paddingLeft: 14, paddingRight: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ position: "absolute", left: 0, top: 4, bottom: 4, borderLeft: "2px solid var(--text)" }} />
+      <div style={{ position: "absolute", left: 0, top: 4, width: 8, height: 2, background: "var(--text)" }} />
+      <div style={{ position: "absolute", left: 0, bottom: 4, width: 8, height: 2, background: "var(--text)" }} />
+      <div style={{ position: "absolute", right: 0, top: 4, bottom: 4, borderRight: "2px solid var(--text)" }} />
+      <div style={{ position: "absolute", right: 0, top: 4, width: 8, height: 2, background: "var(--text)" }} />
+      <div style={{ position: "absolute", right: 0, bottom: 4, width: 8, height: 2, background: "var(--text)" }} />
       {children}
     </div>
   );
@@ -310,9 +313,6 @@ function HomeContent() {
           0%   { transform: translateX(-50%); }
           100% { transform: translateX(0); }
         }
-        @media (min-width: 768px) {
-          .tk-main { padding-top: 48px !important; }
-        }
       `}</style>
 
       <PitchBackground />
@@ -328,7 +328,7 @@ function HomeContent() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "flex-start",
+            justifyContent: "center",
             padding: "24px 24px",
             paddingTop: 32,
             paddingBottom: 32,
@@ -429,7 +429,7 @@ function HomeContent() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
             <Bracket>
               <div>
-                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>SELECT A SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={pickedKnockout}
@@ -467,7 +467,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>OR PICK TWO 2026 NATIONS OF YOUR CHOICE</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>OR PICK TWO PARTICIPANTS OF YOUR CHOICE</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -493,7 +493,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>OR:</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>OR:</div>
                 <button
                   onClick={selectRandom}
                   style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
@@ -660,7 +660,7 @@ export default function Home() {
 function pickerSelectStyle(active: boolean): CSSProperties {
   return {
     fontFamily: "var(--font-press-start), monospace",
-    fontSize: 7,
+    fontSize: 8,
     padding: "9px 10px",
     background: "#0a0e14",
     border: `2px solid ${active ? "var(--gold)" : "var(--panel-border)"}`,
