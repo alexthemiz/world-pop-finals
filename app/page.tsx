@@ -64,18 +64,8 @@ function PitchBackground() {
   );
 }
 
-function Bracket({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ position: "relative", paddingLeft: 14, paddingRight: 14, display: "flex", flexDirection: "column", gap: 14 }}>
-      <div style={{ position: "absolute", left: 0, top: 4, bottom: 4, borderLeft: "2px solid var(--text)" }} />
-      <div style={{ position: "absolute", left: 0, top: 4, width: 8, height: 2, background: "var(--text)" }} />
-      <div style={{ position: "absolute", left: 0, bottom: 4, width: 8, height: 2, background: "var(--text)" }} />
-      <div style={{ position: "absolute", right: 0, top: 4, bottom: 4, borderRight: "2px solid var(--text)" }} />
-      <div style={{ position: "absolute", right: 0, top: 4, width: 8, height: 2, background: "var(--text)" }} />
-      <div style={{ position: "absolute", right: 0, bottom: 4, width: 8, height: 2, background: "var(--text)" }} />
-      {children}
-    </div>
-  );
+function Divider() {
+  return <div style={{ width: "100%", maxWidth: 460, height: 1, background: "var(--text)" }} />;
 }
 
 function HomeContent() {
@@ -383,6 +373,8 @@ function HomeContent() {
             ))}
           </div>
 
+          <Divider />
+
           {/* Outstanding challenges */}
           {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
             <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
@@ -427,7 +419,7 @@ function HomeContent() {
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
-            <Bracket>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%" }}>
               <div>
                 <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
@@ -501,8 +493,10 @@ function HomeContent() {
                   RANDOM MATCHUP
                 </button>
               </div>
-            </Bracket>
+            </div>
           </div>
+
+          <Divider />
 
           {/* Single player */}
           {mode === "single" && (
@@ -528,25 +522,29 @@ function HomeContent() {
           {/* Enter name + create game (Versus mode only) */}
           {mode === "vs-friend" && !waitingGameId && (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
-                ENTER YOUR NAME
-              </label>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="PLAYER 1"
-                maxLength={16}
-                style={{
-                  fontFamily: "var(--font-press-start), monospace",
-                  fontSize: 10,
-                  padding: 10,
-                  background: "#0a0e14",
-                  border: "2px solid var(--panel-border)",
-                  color: "var(--text)",
-                  borderRadius: 4,
-                  width: 140,
-                }}
-              />
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <label style={{ fontSize: 8, color: "var(--text)" }}>
+                  ENTER YOUR NAME:
+                </label>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="PLAYER 1"
+                  maxLength={16}
+                  style={{
+                    fontFamily: "var(--font-press-start), monospace",
+                    fontSize: 10,
+                    padding: 10,
+                    background: "#0a0e14",
+                    border: "2px solid var(--panel-border)",
+                    color: "var(--text)",
+                    borderRadius: 4,
+                    width: 140,
+                  }}
+                />
+              </div>
+              {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
+              <Divider />
               <button
                 onClick={handleCreateGame}
                 disabled={creating}
@@ -554,7 +552,6 @@ function HomeContent() {
               >
                 {creating ? "..." : "CREATE GAME LINK"}
               </button>
-              {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
             </div>
           )}
           {mode === "vs-friend" && !waitingGameId && myGames.length > 0 && (
