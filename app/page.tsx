@@ -64,6 +64,30 @@ function PitchBackground() {
   );
 }
 
+function StepRow({ number, label, children }: { number: number; label: string; children: React.ReactNode }) {
+  return (
+    <div className="tk-step-row" style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
+      <div style={{ width: 150, flexShrink: 0, fontSize: 8, color: "var(--text)", textAlign: "left" }}>
+        {number}. {label}
+      </div>
+      <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Bracket({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ position: "relative", paddingLeft: 14, display: "flex", flexDirection: "column", gap: 14 }}>
+      <div style={{ position: "absolute", left: 0, top: 4, bottom: 4, borderLeft: "2px solid var(--panel-border)" }} />
+      <div style={{ position: "absolute", left: 0, top: 4, width: 8, height: 2, background: "var(--panel-border)" }} />
+      <div style={{ position: "absolute", left: 0, bottom: 4, width: 8, height: 2, background: "var(--panel-border)" }} />
+      {children}
+    </div>
+  );
+}
+
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -302,6 +326,9 @@ function HomeContent() {
         @media (min-width: 768px) {
           .tk-main { padding-top: 48px !important; }
         }
+        @media (min-width: 600px) {
+          .tk-step-row { flex-direction: row !important; align-items: flex-start !important; }
+        }
       `}</style>
 
       <PitchBackground />
@@ -340,234 +367,232 @@ function HomeContent() {
             <p style={{ fontSize: 9, color: "var(--text)", marginTop: 10 }}>
               COUNTRY TRIVIA SHOOTOUT
             </p>
-            {gamesPlayed !== null && (
-              <p style={{ fontSize: 8, color: "var(--gold)", marginTop: 12 }}>
-                {gamesPlayed.toLocaleString()} GAMES PLAYED
-              </p>
-            )}
           </div>
 
-          <label style={{ fontSize: 8, color: "var(--text)" }}>1. PICK A MODE</label>
-
-          {/* Mode toggle */}
-          <div
-            style={{
-              display: "flex",
-              background: "var(--panel)",
-              border: "3px solid var(--panel-border)",
-              borderRadius: 6,
-              overflow: "hidden",
-            }}
-          >
-            {(["vs-friend", "single"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => { setMode(m); setError(null); }}
-                style={{
-                  fontSize: 9,
-                  padding: "12px 20px",
-                  background: mode === m ? "var(--gold)" : "transparent",
-                  color: mode === m ? "#000" : "var(--text-dim)",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                {m === "single" ? "SINGLE PLAYER" : "CHALLENGE MODE"}
-              </button>
-            ))}
-          </div>
-
-          <label style={{ fontSize: 8, color: "var(--text)" }}>2. PICK THE COUNTRIES</label>
-
-          {/* Match picker */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 440 }}>
-            <label style={{ fontSize: 8, color: "var(--text)" }}>PICK A SPECIFIC MATCH FROM THE 2026 TOURNAMENT</label>
-            <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
-              <select
-                value={pickedKnockout}
-                onChange={(e) => selectKnockout(e.target.value)}
-                style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
-              >
-                <option value="">— KNOCKOUT STAGE —</option>
-                {KNOCKOUT_ROUNDS.map((round) => (
-                  <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
-                    {(groupedKnockout[round] ?? []).map((p) => (
-                      <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                        {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-              <select
-                value={pickedGroupMatch}
-                onChange={(e) => selectGroupMatch(e.target.value)}
-                style={{ ...pickerSelectStyle(pickerMode === "group"), width: "calc(50% - 4px)", minWidth: 140 }}
-              >
-                <option value="">— GROUP STAGE —</option>
-                {groups.map((g) => (
-                  <optgroup key={g} label={`── GROUP ${g} ──`}>
-                    {groupedMatches[g].map((p) => (
-                      <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                        {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </div>
-
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR PICK THE TWO COUNTRIES</label>
-            <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
-              <select
-                value={customHome}
-                onChange={(e) => selectCustomHome(e.target.value)}
-                style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
-              >
-                <option value="">— COUNTRY 1 —</option>
-                {countryNames.filter((c) => c !== customAway).map((c) => (
-                  <option key={c} value={c}>{c.toUpperCase()}</option>
-                ))}
-              </select>
-              <select
-                value={customAway}
-                onChange={(e) => selectCustomAway(e.target.value)}
-                style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
-              >
-                <option value="">— COUNTRY 2 —</option>
-                {countryNames.filter((c) => c !== customHome).map((c) => (
-                  <option key={c} value={c}>{c.toUpperCase()}</option>
-                ))}
-              </select>
-            </div>
-
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR CLICK FOR A RANDOM MATCHUP</label>
-            <button
-              onClick={selectRandom}
-              style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
-            >
-              RANDOM COUNTRIES
-            </button>
-          </div>
-
-          {mode === "single" && (
-            <label style={{ fontSize: 8, color: "var(--text)" }}>3. PLAY</label>
-          )}
-
-          {/* Single player */}
-          {mode === "single" && (
-            <button
-              onClick={() => {
-                // getMatchPairs() falls back to the full random pool when the
-                // current picker mode doesn't have a complete selection yet —
-                // only route with home/away when it resolved to one specific pair.
-                const pairs = getMatchPairs();
-                if (pickerMode !== "random" && pairs.length === 1) {
-                  const pair = pairs[0];
-                  router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
-                  return;
-                }
-                router.push("/single");
+          <StepRow number={1} label="PICK A MODE">
+            <div
+              style={{
+                display: "flex",
+                background: "var(--panel)",
+                border: "3px solid var(--panel-border)",
+                borderRadius: 6,
+                overflow: "hidden",
+                width: "fit-content",
               }}
-              style={ctaButtonStyle}
             >
-              PLAY
-            </button>
+              {(["vs-friend", "single"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => { setMode(m); setError(null); }}
+                  style={{
+                    fontSize: 9,
+                    padding: "12px 20px",
+                    background: mode === m ? "var(--gold)" : "transparent",
+                    color: mode === m ? "#000" : "var(--text-dim)",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {m === "single" ? "SINGLE PLAYER" : "VERSUS"}
+                </button>
+              ))}
+            </div>
+          </StepRow>
+
+          {/* Outstanding challenges (not a numbered step) */}
+          {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
+            <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
+              <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
+                OUTSTANDING CHALLENGES
+              </div>
+              {outstandingGames.map((g) => {
+                const iP1 = g.player1_uuid === uuid;
+                const myName = iP1 ? g.player1_name : g.player2_name;
+                const oppName = iP1 ? g.player2_name : g.player1_name;
+                const myAnswers = iP1 ? g.player1_answers : g.player2_answers;
+                const myTurn = g.phase !== "waiting" && myAnswers.length < g.questions.length;
+                const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : myTurn ? "YOUR TURN" : "WAITING ON OPPONENT";
+                const statusColor = g.phase === "waiting" ? "var(--text-dim)" : myTurn ? "var(--gold)" : "var(--green)";
+                return (
+                  <button
+                    key={g.id}
+                    onClick={() => router.push(`/game/${g.id}`)}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      padding: "8px 0",
+                      background: "transparent",
+                      border: "none",
+                      borderBottom: "1px solid var(--panel-border)",
+                      color: "var(--text)",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      fontSize: 8,
+                      textAlign: "left",
+                    }}
+                  >
+                    <span>{myName?.toUpperCase() ?? "YOU"} vs {oppName?.toUpperCase() ?? "?"}</span>
+                    <span style={{ color: statusColor }}>{statusLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
 
-          {/* VS Friend */}
+          {/* Step 2: Enter your name (Versus mode only) */}
           {mode === "vs-friend" && !waitingGameId && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-              {outstandingGames.length > 0 && (
-                <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
-                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
-                    OUTSTANDING CHALLENGES
-                  </div>
-                  {outstandingGames.map((g) => {
-                    const iP1 = g.player1_uuid === uuid;
-                    const myName = iP1 ? g.player1_name : g.player2_name;
-                    const oppName = iP1 ? g.player2_name : g.player1_name;
-                    const myAnswers = iP1 ? g.player1_answers : g.player2_answers;
-                    const myTurn = g.phase !== "waiting" && myAnswers.length < g.questions.length;
-                    const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : myTurn ? "YOUR TURN" : "WAITING ON OPPONENT";
-                    const statusColor = g.phase === "waiting" ? "var(--text-dim)" : myTurn ? "var(--gold)" : "var(--green)";
-                    return (
-                      <button
-                        key={g.id}
-                        onClick={() => router.push(`/game/${g.id}`)}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          width: "100%",
-                          padding: "8px 0",
-                          background: "transparent",
-                          border: "none",
-                          borderBottom: "1px solid var(--panel-border)",
-                          color: "var(--text)",
-                          cursor: "pointer",
-                          fontFamily: "inherit",
-                          fontSize: 8,
-                          textAlign: "left",
-                        }}
-                      >
-                        <span>{myName?.toUpperCase() ?? "YOU"} vs {oppName?.toUpperCase() ?? "?"}</span>
-                        <span style={{ color: statusColor }}>{statusLabel}</span>
-                      </button>
-                    );
-                  })}
+            <StepRow number={2} label="ENTER YOUR NAME">
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="PLAYER 1"
+                maxLength={16}
+                style={{
+                  fontFamily: "var(--font-press-start), monospace",
+                  fontSize: 10,
+                  padding: 10,
+                  background: "#0a0e14",
+                  border: "2px solid var(--panel-border)",
+                  color: "var(--text)",
+                  borderRadius: 4,
+                  width: 140,
+                }}
+              />
+            </StepRow>
+          )}
+
+          <StepRow number={mode === "vs-friend" ? 3 : 2} label="PICK THE COUNTRIES">
+            <Bracket>
+              <div>
+                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>1. SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
+                  <select
+                    value={pickedKnockout}
+                    onChange={(e) => selectKnockout(e.target.value)}
+                    style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
+                  >
+                    <option value="">— KNOCKOUT STAGE —</option>
+                    {KNOCKOUT_ROUNDS.map((round) => (
+                      <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
+                        {(groupedKnockout[round] ?? []).map((p) => (
+                          <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
+                            {p.home.toUpperCase()} vs {p.away.toUpperCase()}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <select
+                    value={pickedGroupMatch}
+                    onChange={(e) => selectGroupMatch(e.target.value)}
+                    style={{ ...pickerSelectStyle(pickerMode === "group"), width: "calc(50% - 4px)", minWidth: 140 }}
+                  >
+                    <option value="">— GROUP STAGE —</option>
+                    {groups.map((g) => (
+                      <optgroup key={g} label={`── GROUP ${g} ──`}>
+                        {groupedMatches[g].map((p) => (
+                          <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
+                            {p.home.toUpperCase()} vs {p.away.toUpperCase()}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
                 </div>
-              )}
-              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
-                3. ENTER YOUR NAME
-              </label>
-              <label style={{ fontSize: 8, color: "var(--text)", textAlign: "center" }}>
-                4. CREATE GAME
-              </label>
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="PLAYER 1"
-                  maxLength={16}
-                  style={{
-                    fontFamily: "var(--font-press-start), monospace",
-                    fontSize: 10,
-                    padding: 10,
-                    background: "#0a0e14",
-                    border: "2px solid var(--panel-border)",
-                    color: "var(--text)",
-                    borderRadius: 4,
-                    width: 140,
-                  }}
-                />
-                <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
-                  {creating ? "..." : "CREATE GAME"}
+              </div>
+
+              <div>
+                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>2. TWO 2026 PARTICIPANTS OF YOUR CHOICE</div>
+                <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
+                  <select
+                    value={customHome}
+                    onChange={(e) => selectCustomHome(e.target.value)}
+                    style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
+                  >
+                    <option value="">— COUNTRY 1 —</option>
+                    {countryNames.filter((c) => c !== customAway).map((c) => (
+                      <option key={c} value={c}>{c.toUpperCase()}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={customAway}
+                    onChange={(e) => selectCustomAway(e.target.value)}
+                    style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
+                  >
+                    <option value="">— COUNTRY 2 —</option>
+                    {countryNames.filter((c) => c !== customHome).map((c) => (
+                      <option key={c} value={c}>{c.toUpperCase()}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>3. RANDOM MATCHUP</div>
+                <button
+                  onClick={selectRandom}
+                  style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
+                >
+                  RANDOM MATCHUP
                 </button>
               </div>
-              {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
-              {myGames.length > 0 && (
-                <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", marginTop: 6 }}>
-                  <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
-                    YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
+            </Bracket>
+          </StepRow>
+
+          {mode === "single" && (
+            <StepRow number={3} label="PLAY">
+              <button
+                onClick={() => {
+                  // getMatchPairs() falls back to the full random pool when the
+                  // current picker mode doesn't have a complete selection yet —
+                  // only route with home/away when it resolved to one specific pair.
+                  const pairs = getMatchPairs();
+                  if (pickerMode !== "random" && pairs.length === 1) {
+                    const pair = pairs[0];
+                    router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
+                    return;
+                  }
+                  router.push("/single");
+                }}
+                style={ctaButtonStyle}
+              >
+                PLAY
+              </button>
+            </StepRow>
+          )}
+
+          {mode === "vs-friend" && !waitingGameId && (
+            <StepRow number={4} label="CREATE GAME">
+              <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
+                {creating ? "..." : "CREATE GAME LINK"}
+              </button>
+            </StepRow>
+          )}
+          {mode === "vs-friend" && !waitingGameId && error && (
+            <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>
+          )}
+          {mode === "vs-friend" && !waitingGameId && myGames.length > 0 && (
+            <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
+              <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
+                YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
+              </div>
+              {myGames.map((g) => {
+                const iP1 = g.player1_uuid === uuid;
+                const myName = iP1 ? g.player1_name : g.player2_name;
+                const oppName = iP1 ? g.player2_name : g.player1_name;
+                const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
+                const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
+                const result = my > opp ? "W" : my < opp ? "L" : "D";
+                const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
+                return (
+                  <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
+                    <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
+                    <span style={{ color }}>{result} {my}–{opp}</span>
                   </div>
-                  {myGames.map((g) => {
-                    const iP1 = g.player1_uuid === uuid;
-                    const myName = iP1 ? g.player1_name : g.player2_name;
-                    const oppName = iP1 ? g.player2_name : g.player1_name;
-                    const my = (iP1 ? g.player1_answers : g.player2_answers).filter(Boolean).length;
-                    const opp = (iP1 ? g.player2_answers : g.player1_answers).filter(Boolean).length;
-                    const result = my > opp ? "W" : my < opp ? "L" : "D";
-                    const color = result === "W" ? "var(--green)" : result === "L" ? "var(--red)" : "var(--text-dim)";
-                    return (
-                      <div key={g.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--panel-border)" }}>
-                        <span>{myName?.toUpperCase()} vs {oppName?.toUpperCase()}</span>
-                        <span style={{ color }}>{result} {my}–{opp}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                );
+              })}
             </div>
           )}
 
@@ -625,6 +650,12 @@ function HomeContent() {
                 </div>
               )}
             </div>
+          )}
+
+          {gamesPlayed !== null && (
+            <p style={{ fontSize: 8, color: "var(--gold)" }}>
+              {gamesPlayed.toLocaleString()} GAMES PLAYED
+            </p>
           )}
         </main>
 
