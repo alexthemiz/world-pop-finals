@@ -453,7 +453,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK TWO PARTICIPANTS OF YOUR CHOICE</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK YOUR TWO 2026 PARTICIPANTS</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -513,7 +513,7 @@ function HomeContent() {
 
           {/* Enter name + create game (Versus mode only) */}
           {mode === "vs-friend" && !waitingGameId && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 26 }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <label style={{ fontSize: 8, color: "var(--text)" }}>
                   ENTER YOUR NAME:
@@ -541,7 +541,7 @@ function HomeContent() {
                 disabled={creating}
                 style={{ fontSize: 9, padding: "12px 20px", width: 170, background: "var(--panel)", color: "var(--text)", border: `2px solid ${name.trim() ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
               >
-                {creating ? "..." : "CREATE GAME  LINK"}
+                {creating ? "..." : "CREATE GAME"}
               </button>
             </div>
           )}
