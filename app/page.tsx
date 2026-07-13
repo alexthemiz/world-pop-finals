@@ -66,8 +66,8 @@ function PitchBackground() {
 
 function StepRow({ number, label, children }: { number: number; label: string; children: React.ReactNode }) {
   return (
-    <div className="tk-step-row" style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
-      <div style={{ width: 150, flexShrink: 0, fontSize: 8, color: "var(--text)", textAlign: "left" }}>
+    <div className="tk-step-row" style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxWidth: 640 }}>
+      <div className="tk-step-label" style={{ width: 150, flexShrink: 0, fontSize: 8, color: "var(--text)", textAlign: "left" }}>
         {number}. {label}
       </div>
       <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
@@ -327,7 +327,8 @@ function HomeContent() {
           .tk-main { padding-top: 48px !important; }
         }
         @media (min-width: 600px) {
-          .tk-step-row { flex-direction: row !important; align-items: flex-start !important; }
+          .tk-step-row { flex-direction: row !important; align-items: center !important; }
+          .tk-step-label { text-align: right !important; }
         }
       `}</style>
 
@@ -387,6 +388,7 @@ function HomeContent() {
                   style={{
                     fontSize: 9,
                     padding: "12px 20px",
+                    width: 150,
                     background: mode === m ? "var(--gold)" : "transparent",
                     color: mode === m ? "#000" : "var(--text-dim)",
                     border: "none",
@@ -401,7 +403,7 @@ function HomeContent() {
 
           {/* Outstanding challenges (not a numbered step) */}
           {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
-            <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
+            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 640 }}>
               <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
                 OUTSTANDING CHALLENGES
               </div>
@@ -466,7 +468,7 @@ function HomeContent() {
           <StepRow number={mode === "vs-friend" ? 3 : 2} label="PICK THE COUNTRIES">
             <Bracket>
               <div>
-                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>1. SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>1. SPECIFIC MATCH FROM THE 2026 TOURNAMENT</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={pickedKnockout}
@@ -504,7 +506,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>2. TWO 2026 PARTICIPANTS OF YOUR CHOICE</div>
+                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>2. TWO 2026 PARTICIPANTS OF YOUR CHOICE</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -530,12 +532,12 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 7, color: "var(--text-dim)", marginBottom: 6 }}>3. RANDOM MATCHUP</div>
+                <div style={{ fontSize: 7, color: "var(--text)", marginBottom: 6 }}>3. RANDOM MATCHUP</div>
                 <button
                   onClick={selectRandom}
                   style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
                 >
-                  RANDOM MATCHUP
+                  RANDOMIZE
                 </button>
               </div>
             </Bracket>
@@ -565,7 +567,11 @@ function HomeContent() {
 
           {mode === "vs-friend" && !waitingGameId && (
             <StepRow number={4} label="CREATE GAME">
-              <button onClick={handleCreateGame} disabled={creating} style={ctaButtonStyle}>
+              <button
+                onClick={handleCreateGame}
+                disabled={creating}
+                style={{ fontSize: 8, padding: "10px 24px", background: "var(--panel)", color: "var(--text)", border: "2px solid var(--gold)", borderRadius: 4, cursor: "pointer" }}
+              >
                 {creating ? "..." : "CREATE GAME LINK"}
               </button>
             </StepRow>
@@ -574,7 +580,7 @@ function HomeContent() {
             <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>
           )}
           {mode === "vs-friend" && !waitingGameId && myGames.length > 0 && (
-            <div style={{ fontSize: 8, color: "var(--text-dim)", width: "100%", maxWidth: 340 }}>
+            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 640 }}>
               <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
                 YOUR RECORD: {record.w}W · {record.l}L · {record.d}D
               </div>
