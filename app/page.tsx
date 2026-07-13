@@ -330,11 +330,11 @@ function HomeContent() {
           .tk-main { padding-top: 48px !important; }
         }
         @media (min-width: 600px) {
+          .tk-step-row { padding-top: 20px !important; }
           .tk-step-label {
             position: absolute !important;
             right: calc(50% + 16px) !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
+            top: 0 !important;
             width: 240px !important;
             text-align: right !important;
           }
