@@ -381,10 +381,10 @@ function HomeContent() {
               onClick={selectRandom}
               style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
             >
-              RANDOM
+              RANDOM COUNTRIES
             </button>
 
-            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A KNOCKOUT ROUND MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK A KNOCKOUT ROUND MATCH</label>
             <select
               value={pickedKnockout}
               onChange={(e) => selectKnockout(e.target.value)}
@@ -402,7 +402,7 @@ function HomeContent() {
               ))}
             </select>
 
-            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK A GROUP STAGE MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK A GROUP STAGE MATCH</label>
             <select
               value={pickedGroupMatch}
               onChange={(e) => selectGroupMatch(e.target.value)}
@@ -420,7 +420,7 @@ function HomeContent() {
               ))}
             </select>
 
-            <label style={{ fontSize: 8, color: "var(--text-dim)", marginTop: 14 }}>OR PICK THE TWO COUNTRIES</label>
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 14 }}>OR PICK THE TWO COUNTRIES</label>
             <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
               <select
                 value={customHome}
