@@ -65,7 +65,10 @@ function PitchBackground() {
 }
 
 function Divider() {
-  return <div style={{ width: "100%", maxWidth: 460, height: 1, background: "var(--text)" }} />;
+  // border-top renders as a crisp hairline regardless of the element's
+  // fractional vertical position, unlike a height:1px filled div, which
+  // anti-aliases (looks blurrier/thinner) when it lands on a sub-pixel row.
+  return <div style={{ width: "100%", maxWidth: 460, borderTop: "1px solid var(--text)" }} />;
 }
 
 function HomeContent() {
