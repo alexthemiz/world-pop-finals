@@ -64,13 +64,6 @@ function PitchBackground() {
   );
 }
 
-function Divider() {
-  // border-top renders as a crisp hairline regardless of the element's
-  // fractional vertical position, unlike a height:1px filled div, which
-  // anti-aliases (looks blurrier/thinner) when it lands on a sub-pixel row.
-  return <div style={{ width: "100%", maxWidth: 460, borderTop: "1px solid var(--text)" }} />;
-}
-
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -321,11 +314,11 @@ function HomeContent() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             padding: "24px 24px",
-            paddingTop: 32,
-            paddingBottom: 32,
-            gap: 18,
+            paddingTop: 64,
+            paddingBottom: 48,
+            gap: 26,
             textAlign: "center",
           }}
         >
@@ -376,8 +369,6 @@ function HomeContent() {
             ))}
           </div>
 
-          <Divider />
-
           {/* Outstanding challenges */}
           {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
             <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
@@ -422,9 +413,9 @@ function HomeContent() {
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14, width: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 22, width: "100%" }}>
               <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={pickedKnockout}
@@ -462,7 +453,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>OR PICK TWO PARTICIPANTS OF YOUR CHOICE</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK TWO PARTICIPANTS OF YOUR CHOICE</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -498,8 +489,6 @@ function HomeContent() {
               </div>
             </div>
           </div>
-
-          <Divider />
 
           {/* Single player */}
           {mode === "single" && (
@@ -539,7 +528,7 @@ function HomeContent() {
                     fontSize: 10,
                     padding: 10,
                     background: "#0a0e14",
-                    border: "2px solid var(--panel-border)",
+                    border: `2px solid ${name.trim() ? "var(--panel-border)" : "var(--gold)"}`,
                     color: "var(--text)",
                     borderRadius: 4,
                     width: 140,
@@ -547,13 +536,12 @@ function HomeContent() {
                 />
               </div>
               {error && <div style={{ fontSize: 8, color: "var(--red)" }}>{error}</div>}
-              <Divider />
               <button
                 onClick={handleCreateGame}
                 disabled={creating}
-                style={{ fontSize: 8, padding: "10px 24px", background: "var(--panel)", color: "var(--text)", border: "2px solid var(--gold)", borderRadius: 4, cursor: "pointer" }}
+                style={{ fontSize: 9, padding: "12px 20px", width: 170, background: "var(--panel)", color: "var(--text)", border: `2px solid ${name.trim() ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
               >
-                {creating ? "..." : "CREATE GAME LINK"}
+                {creating ? "..." : "CREATE GAME  LINK"}
               </button>
             </div>
           )}
