@@ -377,21 +377,14 @@ function HomeContent() {
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 440 }}>
-            <button
-              onClick={selectRandom}
-              style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
-            >
-              RANDOM COUNTRIES
-            </button>
-
-            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR PICK A SPECIFIC MATCH</label>
+            <label style={{ fontSize: 8, color: "var(--text)" }}>PICK A SPECIFIC MATCH FROM THE 2026 TOURNAMENT</label>
             <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
               <select
                 value={pickedKnockout}
                 onChange={(e) => selectKnockout(e.target.value)}
                 style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
               >
-                <option value="">— KNOCKOUT MATCH —</option>
+                <option value="">— KNOCKOUT STAGE —</option>
                 {KNOCKOUT_ROUNDS.map((round) => (
                   <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
                     {(groupedKnockout[round] ?? []).map((p) => (
@@ -407,7 +400,7 @@ function HomeContent() {
                 onChange={(e) => selectGroupMatch(e.target.value)}
                 style={{ ...pickerSelectStyle(pickerMode === "group"), width: "calc(50% - 4px)", minWidth: 140 }}
               >
-                <option value="">— GROUP MATCH —</option>
+                <option value="">— GROUP STAGE —</option>
                 {groups.map((g) => (
                   <optgroup key={g} label={`── GROUP ${g} ──`}>
                     {groupedMatches[g].map((p) => (
@@ -443,6 +436,14 @@ function HomeContent() {
                 ))}
               </select>
             </div>
+
+            <label style={{ fontSize: 8, color: "var(--text)", marginTop: 10 }}>OR CLICK FOR A RANDOM MATCHUP</label>
+            <button
+              onClick={selectRandom}
+              style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
+            >
+              RANDOM COUNTRIES
+            </button>
           </div>
 
           {/* Single player */}
@@ -510,7 +511,7 @@ function HomeContent() {
                 </div>
               )}
               <label style={{ fontSize: 8, color: "var(--text-dim)", textAlign: "center" }}>
-                YOUR NAME
+                ENTER YOUR NAME
               </label>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <input
