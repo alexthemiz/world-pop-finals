@@ -343,7 +343,7 @@ function HomeContent() {
           <div
             style={{
               display: "flex",
-              background: "var(--panel)",
+              background: "#0a0e14",
               border: "3px solid var(--panel-border)",
               borderRadius: 6,
               overflow: "hidden",
@@ -377,7 +377,7 @@ function HomeContent() {
               alignItems: "center",
               gap: 10,
               padding: "10px 18px",
-              background: pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "rgba(255,200,0,0.15)" : "var(--panel)",
+              background: pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "rgba(255,200,0,0.15)" : "#0a0e14",
               border: `2px solid ${pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "var(--gold)" : "var(--panel-border)"}`,
               borderRadius: 6,
               cursor: "pointer",
