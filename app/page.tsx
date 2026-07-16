@@ -369,6 +369,28 @@ function HomeContent() {
             ))}
           </div>
 
+          {/* Finals quick-pick */}
+          <button
+            onClick={() => selectKnockout("Spain|Argentina")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "10px 18px",
+              background: pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "rgba(255,200,0,0.15)" : "var(--panel)",
+              border: `2px solid ${pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "var(--gold)" : "var(--panel-border)"}`,
+              borderRadius: 6,
+              cursor: "pointer",
+              color: "var(--text)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://flagcdn.com/32x24/es.png" width={32} height={24} alt="Spain" style={{ imageRendering: "pixelated" }} />
+            <span style={{ fontSize: 8, color: "var(--gold)", whiteSpace: "nowrap" }}>⚽ THE FINAL ⚽</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://flagcdn.com/32x24/ar.png" width={32} height={24} alt="Argentina" style={{ imageRendering: "pixelated" }} />
+          </button>
+
           {/* Outstanding challenges */}
           {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
             <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
