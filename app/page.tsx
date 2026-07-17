@@ -194,13 +194,14 @@ function HomeContent() {
   useEffect(() => {
     const uuid = getOrCreateUUID();
     if (!uuid) return;
+    const dismissed = JSON.parse(localStorage.getItem("tk-dismissed-games") ?? "[]") as string[];
     supabase
       .from("games")
       .select("id, questions, player1_name, player2_name, player1_answers, player2_answers, phase, player1_uuid, player2_uuid")
       .in("phase", ["waiting", "active", "sudden_death"])
       .or(`player1_uuid.eq.${uuid},player2_uuid.eq.${uuid}`)
       .order("created_at", { ascending: false })
-      .then(({ data }) => { if (data) setOutstandingGames(data as GameRow[]); });
+      .then(({ data }) => { if (data) setOutstandingGames((data as GameRow[]).filter((g) => !dismissed.includes(g.id))); });
   }, []);
 
   const outstandingIds = outstandingGames.map((g) => g.id).join(",");
@@ -571,6 +572,11 @@ function HomeContent() {
                           if (g.phase === "waiting") {
                             await supabase.from("games").delete().eq("id", g.id).eq("phase", "waiting");
                             localStorage.removeItem(`trivia-kicks:${g.id}`);
+                          } else {
+                            const dismissed = JSON.parse(localStorage.getItem("tk-dismissed-games") ?? "[]") as string[];
+                            if (!dismissed.includes(g.id)) {
+                              localStorage.setItem("tk-dismissed-games", JSON.stringify([...dismissed, g.id]));
+                            }
                           }
                           setOutstandingGames((prev) => prev.filter((x) => x.id !== g.id));
                         }}
