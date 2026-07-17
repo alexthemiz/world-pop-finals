@@ -68,9 +68,9 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"single" | "vs-friend">(() => {
-    if (typeof localStorage === "undefined") return "vs-friend";
+    if (typeof localStorage === "undefined") return "single";
     const saved = localStorage.getItem("tk-mode");
-    return saved === "single" || saved === "vs-friend" ? saved : "vs-friend";
+    return saved === "single" || saved === "vs-friend" ? saved : "single";
   });
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -349,7 +349,7 @@ function HomeContent() {
               overflow: "hidden",
             }}
           >
-            {(["vs-friend", "single"] as const).map((m) => (
+            {(["single", "vs-friend"] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => { setMode(m); setError(null); }}
@@ -390,48 +390,6 @@ function HomeContent() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://flagcdn.com/32x24/ar.png" width={32} height={24} alt="Argentina" style={{ imageRendering: "pixelated" }} />
           </button>
-
-          {/* Outstanding challenges */}
-          {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
-            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
-              <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
-                OUTSTANDING CHALLENGES
-              </div>
-              {outstandingGames.map((g) => {
-                const iP1 = g.player1_uuid === uuid;
-                const myName = iP1 ? g.player1_name : g.player2_name;
-                const oppName = iP1 ? g.player2_name : g.player1_name;
-                const myAnswers = iP1 ? g.player1_answers : g.player2_answers;
-                const myTurn = g.phase !== "waiting" && myAnswers.length < g.questions.length;
-                const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : myTurn ? "YOUR TURN" : "WAITING ON OPPONENT";
-                const statusColor = g.phase === "waiting" ? "var(--text-dim)" : myTurn ? "var(--gold)" : "var(--green)";
-                return (
-                  <button
-                    key={g.id}
-                    onClick={() => router.push(`/game/${g.id}`)}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      width: "100%",
-                      padding: "8px 0",
-                      background: "transparent",
-                      border: "none",
-                      borderBottom: "1px solid var(--panel-border)",
-                      color: "var(--text)",
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                      fontSize: 8,
-                      textAlign: "left",
-                    }}
-                  >
-                    <span>{myName?.toUpperCase() ?? "YOU"} vs {oppName?.toUpperCase() ?? "?"}</span>
-                    <span style={{ color: statusColor }}>{statusLabel}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
@@ -500,15 +458,17 @@ function HomeContent() {
                 </div>
               </div>
 
-              <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 6 }}>OR:</div>
+              {pickerMode !== "random" && (
                 <button
                   onClick={selectRandom}
-                  style={{ fontSize: 8, padding: "10px 24px", background: pickerMode === "random" ? "var(--gold)" : "var(--panel)", color: pickerMode === "random" ? "#000" : "var(--text-dim)", border: `2px solid ${pickerMode === "random" ? "var(--gold)" : "var(--panel-border)"}`, borderRadius: 4, cursor: "pointer" }}
+                  style={{ fontSize: 7, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", padding: 0, textDecoration: "underline" }}
                 >
-                  RANDOM MATCHUP
+                  CLEAR — USE RANDOM MATCHUP
                 </button>
-              </div>
+              )}
+              {pickerMode === "random" && (
+                <div style={{ fontSize: 7, color: "var(--text-dim)" }}>NO SELECTION = RANDOM MATCHUP</div>
+              )}
             </div>
           </div>
 
@@ -567,6 +527,62 @@ function HomeContent() {
               </button>
             </div>
           )}
+          {/* Outstanding challenges */}
+          {mode === "vs-friend" && !waitingGameId && outstandingGames.length > 0 && (
+            <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
+              <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
+                OUTSTANDING CHALLENGES
+              </div>
+              {outstandingGames.map((g) => {
+                const iP1 = g.player1_uuid === uuid;
+                const myName = iP1 ? g.player1_name : g.player2_name;
+                const oppName = iP1 ? g.player2_name : g.player1_name;
+                const myAnswers = iP1 ? g.player1_answers : g.player2_answers;
+                const myTurn = g.phase !== "waiting" && myAnswers.length < g.questions.length;
+                const statusLabel = g.phase === "waiting" ? "UNCLAIMED" : myTurn ? "YOUR TURN" : "WAITING ON OPPONENT";
+                const statusColor = g.phase === "waiting" ? "var(--text-dim)" : myTurn ? "var(--gold)" : "var(--green)";
+                return (
+                  <div
+                    key={g.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      width: "100%",
+                      padding: "8px 0",
+                      borderBottom: "1px solid var(--panel-border)",
+                      fontSize: 8,
+                    }}
+                  >
+                    <button
+                      onClick={() => router.push(`/game/${g.id}`)}
+                      style={{ background: "transparent", border: "none", color: "var(--text)", cursor: "pointer", fontFamily: "inherit", fontSize: 8, textAlign: "left", padding: 0, flex: 1 }}
+                    >
+                      {myName?.toUpperCase() ?? "YOU"} vs {oppName?.toUpperCase() ?? "?"}
+                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                      <span style={{ color: statusColor }}>{statusLabel}</span>
+                      {g.phase === "waiting" && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await supabase.from("games").delete().eq("id", g.id).eq("phase", "waiting");
+                            localStorage.removeItem(`trivia-kicks:${g.id}`);
+                            setOutstandingGames((prev) => prev.filter((x) => x.id !== g.id));
+                          }}
+                          style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: 12, padding: "0 4px", lineHeight: 1 }}
+                          title="Cancel game"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {mode === "vs-friend" && !waitingGameId && myGames.length > 0 && (
             <div style={{ fontSize: 8, color: "var(--text)", width: "100%", maxWidth: 460 }}>
               <div style={{ color: "var(--gold)", marginBottom: 8, fontSize: 9, textAlign: "center" }}>
