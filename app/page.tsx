@@ -461,13 +461,13 @@ function HomeContent() {
               {pickerMode !== "random" && (
                 <button
                   onClick={selectRandom}
-                  style={{ fontSize: 7, background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", padding: 0, textDecoration: "underline" }}
+                  style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text)", cursor: "pointer", padding: 0, textDecoration: "underline", fontFamily: "inherit" }}
                 >
                   CLEAR — USE RANDOM MATCHUP
                 </button>
               )}
               {pickerMode === "random" && (
-                <div style={{ fontSize: 7, color: "var(--text-dim)" }}>NO SELECTION = RANDOM MATCHUP</div>
+                <div style={{ fontSize: 8, color: "var(--text)" }}>NO SELECTION = RANDOM MATCHUP</div>
               )}
             </div>
           </div>
