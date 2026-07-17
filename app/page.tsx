@@ -507,7 +507,7 @@ function HomeContent() {
                   maxLength={16}
                   style={{
                     fontFamily: "var(--font-press-start), monospace",
-                    fontSize: 10,
+                    fontSize: 16,
                     padding: 10,
                     background: "#0a0e14",
                     border: `2px solid ${name.trim() ? "var(--panel-border)" : "var(--gold)"}`,
@@ -562,20 +562,20 @@ function HomeContent() {
                     </button>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
                       <span style={{ color: statusColor }}>{statusLabel}</span>
-                      {g.phase === "waiting" && (
-                        <button
-                          onClick={async (e) => {
-                            e.stopPropagation();
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (g.phase === "waiting") {
                             await supabase.from("games").delete().eq("id", g.id).eq("phase", "waiting");
                             localStorage.removeItem(`trivia-kicks:${g.id}`);
-                            setOutstandingGames((prev) => prev.filter((x) => x.id !== g.id));
-                          }}
-                          style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: 12, padding: "0 4px", lineHeight: 1 }}
-                          title="Cancel game"
-                        >
-                          ✕
-                        </button>
-                      )}
+                          }
+                          setOutstandingGames((prev) => prev.filter((x) => x.id !== g.id));
+                        }}
+                        style={{ background: "transparent", border: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: 12, padding: "0 4px", lineHeight: 1 }}
+                        title="Remove"
+                      >
+                        ✕
+                      </button>
                     </div>
                   </div>
                 );
