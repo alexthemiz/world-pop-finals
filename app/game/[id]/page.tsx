@@ -270,7 +270,7 @@ export default function GameRoom() {
             <div style={{ fontSize: 10, color: "var(--gold)" }}>START A NEW GAME</div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
               <button onClick={() => router.push("/single")} style={ctaButtonStyle}>SINGLE PLAYER</button>
-              <button onClick={() => router.push("/?mode=challenge")} style={ctaButtonStyle}>CHALLENGE MODE</button>
+              <button onClick={() => router.push("/?mode=challenge")} style={ctaButtonStyle}>VERSUS MODE</button>
             </div>
           </div>
         </main>
