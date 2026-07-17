@@ -62,7 +62,7 @@ export default function NavBar({ active }: { active: "single" | "challenge" | nu
                 cursor: "pointer",
               }}
             >
-              {m === "single" ? "SINGLE" : "CHALLENGE"}
+              {m === "single" ? "SINGLE PLAYER" : "VERSUS"}
             </button>
           ))}
         </div>
