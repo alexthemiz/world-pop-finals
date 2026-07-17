@@ -508,12 +508,15 @@ function HomeContent() {
                   style={{
                     fontFamily: "var(--font-press-start), monospace",
                     fontSize: 16,
-                    padding: 10,
+                    padding: 16,
                     background: "#0a0e14",
                     border: `2px solid ${name.trim() ? "var(--panel-border)" : "var(--gold)"}`,
                     color: "var(--text)",
                     borderRadius: 4,
-                    width: 140,
+                    width: 224,
+                    transform: "scale(0.625)",
+                    transformOrigin: "left center",
+                    marginRight: -84,
                   }}
                 />
               </div>
