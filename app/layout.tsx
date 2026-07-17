@@ -9,6 +9,11 @@ const pressStart2P = Press_Start_2P({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://triviakicks.com"),
   title: "Trivia Kicks",
