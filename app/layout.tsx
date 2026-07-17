@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Press_Start_2P } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import FeedbackButton from "@/components/FeedbackButton";
 
@@ -38,6 +39,13 @@ export default function RootLayout({
       <body>
         {children}
         <FeedbackButton />
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-PK4ZNGCPVE" strategy="afterInteractive" />
+        <Script id="ga-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-PK4ZNGCPVE');
+        `}</Script>
       </body>
     </html>
   );
