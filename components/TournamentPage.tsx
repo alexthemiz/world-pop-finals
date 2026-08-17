@@ -1,22 +1,47 @@
 "use client";
 
-import { Suspense, useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
-import { getAllMatchPairs, getAllCountryPairs } from "@/lib/matches";
-import { getAllKnockoutPairs, KNOCKOUT_ROUNDS } from "@/lib/knockoutMatches";
-import { COUNTRIES } from "@/lib/countries";
 import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 import Footer from "@/components/Footer";
-import { PitchBackground, FlagTicker } from "@/components/HomeDecorations";
+import type { TournamentConfig } from "@/lib/tournaments/types";
 
 function makeGameId(): string {
   return Math.random().toString(36).slice(2, 9);
 }
 
-function HomeContent() {
+function pickerSelectStyle(active: boolean): CSSProperties {
+  return {
+    fontFamily: "var(--font-press-start), monospace",
+    fontSize: 8,
+    padding: "9px 10px",
+    background: "#0a0e14",
+    border: `2px solid ${active ? "var(--gold)" : "var(--panel-border)"}`,
+    color: "var(--text)",
+    borderRadius: 4,
+    width: "100%",
+    cursor: "pointer",
+  };
+}
+
+const ctaButtonStyle: CSSProperties = {
+  fontSize: 11,
+  padding: "16px 20px",
+  background: "var(--panel)",
+  border: "3px solid var(--gold)",
+  color: "var(--text)",
+  borderRadius: 6,
+  cursor: "pointer",
+};
+
+interface TournamentPageProps {
+  config: TournamentConfig;
+}
+
+export default function TournamentPage({ config }: TournamentPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<"single" | "vs-friend">(() => {
@@ -28,9 +53,6 @@ function HomeContent() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [myGames, setMyGames] = useState<GameRow[]>([]);
-  // Not restored from localStorage on load: the underlying selection (which
-  // knockout match, which countries) isn't persisted, so restoring only the
-  // mode would show an "active" picker with nothing actually picked.
   const [pickerMode, setPickerMode] = useState<"random" | "knockout" | "group" | "custom">("random");
   const [pickedKnockout, setPickedKnockout] = useState("");
   const [pickedGroupMatch, setPickedGroupMatch] = useState("");
@@ -42,10 +64,9 @@ function HomeContent() {
   const [notifyState, setNotifyState] = useState<"idle" | "on" | "blocked">("idle");
   const [outstandingGames, setOutstandingGames] = useState<GameRow[]>([]);
 
-  const allPairs = getAllMatchPairs();
-  const knockoutPairs = getAllKnockoutPairs();
-  const allCountryPairs = getAllCountryPairs();
-  const countryNames = Object.keys(COUNTRIES).sort();
+  const allPairs = config.groups.map((m) => ({ home: m.home, away: m.away, group: m.group }));
+  const knockoutPairs = config.knockout.map((m) => ({ home: m.home, away: m.away, group: m.group }));
+  const countryNames = config.nations.sort();
 
   const groupedMatches: Record<string, typeof allPairs> = {};
   allPairs.forEach((p) => {
@@ -72,7 +93,7 @@ function HomeContent() {
     } else if (pickerMode === "custom" && customHome && customAway) {
       return [{ home: customHome, away: customAway, group: "" }];
     }
-    return allCountryPairs;
+    return allPairs;
   }
 
   function selectRandom() {
@@ -241,6 +262,8 @@ function HomeContent() {
     { w: 0, l: 0, d: 0 }
   );
 
+  const finalsKey = config.finalsMatch ? `${config.finalsMatch.home}|${config.finalsMatch.away}` : null;
+
   return (
     <>
       <style>{`
@@ -253,11 +276,6 @@ function HomeContent() {
           100% { transform: translateX(0); }
         }
       `}</style>
-
-      <PitchBackground />
-
-      <FlagTicker direction="left" />
-      <FlagTicker direction="right" />
 
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
         <main
@@ -275,21 +293,13 @@ function HomeContent() {
             textAlign: "center",
           }}
         >
+          {/* Back link + tournament header */}
           <div>
-            <h1
-              style={{
-                fontSize: "clamp(20px, 5vw, 32px)",
-                color: "var(--gold)",
-                margin: 0,
-                lineHeight: 1.6,
-                textShadow: "0 0 20px rgba(255,200,0,0.4)",
-              }}
-            >
-              TRIVIA KICKS
-            </h1>
-            <p style={{ fontSize: 9, color: "var(--text)", marginTop: 10 }}>
-              COUNTRY TRIVIA SHOOTOUT
-            </p>
+            <div style={{ marginBottom: 4 }}>
+              <a href="/" style={{ fontSize: 9, color: "var(--gold)", textDecoration: "none" }}>◀ TRIVIA KICKS</a>
+            </div>
+            <div style={{ fontSize: 16, color: "var(--gold)", letterSpacing: 2 }}>{config.emoji} {config.name.toUpperCase()}</div>
+            <div style={{ fontSize: 8, color: "var(--text-dim)", marginBottom: 4 }}>{config.hosts} · {config.year}</div>
           </div>
 
           {/* Mode toggle */}
@@ -323,32 +333,31 @@ function HomeContent() {
           </div>
 
           {/* Finals quick-pick */}
-          <button
-            onClick={() => selectKnockout("Spain|Argentina")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 18px",
-              background: pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "rgba(255,200,0,0.15)" : "#0a0e14",
-              border: `2px solid ${pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "var(--gold)" : "var(--panel-border)"}`,
-              borderRadius: 6,
-              cursor: "pointer",
-              color: "var(--text)",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://flagcdn.com/32x24/es.png" width={32} height={24} alt="Spain" style={{ imageRendering: "pixelated" }} />
-            <span style={{ fontSize: 8, color: "var(--gold)", whiteSpace: "nowrap" }}>⚽ THE FINAL ⚽</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://flagcdn.com/32x24/ar.png" width={32} height={24} alt="Argentina" style={{ imageRendering: "pixelated" }} />
-          </button>
+          {config.finalsMatch && finalsKey && (
+            <button
+              onClick={() => selectKnockout(finalsKey)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 18px",
+                background: pickerMode === "knockout" && pickedKnockout === finalsKey ? "rgba(255,200,0,0.15)" : "#0a0e14",
+                border: `2px solid ${pickerMode === "knockout" && pickedKnockout === finalsKey ? "var(--gold)" : "var(--panel-border)"}`,
+                borderRadius: 6,
+                cursor: "pointer",
+                color: "var(--text)",
+              }}
+            >
+              <span style={{ fontSize: 8, color: "var(--gold)", whiteSpace: "nowrap" }}>⚽ THE FINAL ⚽</span>
+              <span style={{ fontSize: 8, color: "var(--text)" }}>{config.finalsMatch.home.toUpperCase()} vs {config.finalsMatch.away.toUpperCase()}</span>
+            </button>
+          )}
 
           {/* Match picker */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 22, width: "100%" }}>
               <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>SELECT A MATCH FROM THE {config.name.toUpperCase()}</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={pickedKnockout}
@@ -356,7 +365,7 @@ function HomeContent() {
                     style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
                   >
                     <option value="">— KNOCKOUT STAGE —</option>
-                    {KNOCKOUT_ROUNDS.map((round) => (
+                    {config.knockoutRounds.map((round) => (
                       <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
                         {(groupedKnockout[round] ?? []).map((p) => (
                           <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
@@ -386,7 +395,7 @@ function HomeContent() {
               </div>
 
               <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK YOUR TWO 2026 PARTICIPANTS</div>
+                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK YOUR TWO {config.name.toUpperCase()} PARTICIPANTS</div>
                 <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
                   <select
                     value={customHome}
@@ -429,9 +438,6 @@ function HomeContent() {
           {mode === "single" && (
             <button
               onClick={() => {
-                // getMatchPairs() falls back to the full random pool when the
-                // current picker mode doesn't have a complete selection yet —
-                // only route with home/away when it resolved to one specific pair.
                 const pairs = getMatchPairs();
                 if (pickerMode !== "random" && pairs.length === 1) {
                   const pair = pairs[0];
@@ -635,35 +641,3 @@ function HomeContent() {
     </>
   );
 }
-
-export default function Home() {
-  return (
-    <Suspense>
-      <HomeContent />
-    </Suspense>
-  );
-}
-
-function pickerSelectStyle(active: boolean): CSSProperties {
-  return {
-    fontFamily: "var(--font-press-start), monospace",
-    fontSize: 8,
-    padding: "9px 10px",
-    background: "#0a0e14",
-    border: `2px solid ${active ? "var(--gold)" : "var(--panel-border)"}`,
-    color: "var(--text)",
-    borderRadius: 4,
-    width: "100%",
-    cursor: "pointer",
-  };
-}
-
-const ctaButtonStyle: CSSProperties = {
-  fontSize: 11,
-  padding: "16px 20px",
-  background: "var(--panel)",
-  border: "3px solid var(--gold)",
-  color: "var(--text)",
-  borderRadius: 6,
-  cursor: "pointer",
-};
