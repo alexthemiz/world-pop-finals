@@ -12,6 +12,7 @@ import ScoreBoard from "@/components/ScoreBoard";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import QuestionReview from "@/components/QuestionReview";
+import H2HPanel from "@/components/H2HPanel";
 import { playCorrect, playWrong, playWin, playLose } from "@/lib/sounds";
 import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 
@@ -349,6 +350,7 @@ export default function GameRoom() {
               totalQuestions={game.questions.length}
             />
             <QuestionReview questions={game.questions} answers={myAnswers} questionStats={questionStats} />
+            <H2HPanel home={game.questions[0].home} away={game.questions[0].away} />
             <div style={{ display: "flex", gap: 12, justifyContent: "center", margin: "20px 0", flexWrap: "wrap" }}>
               <button onClick={handlePlayAgain} style={ctaButtonStyle}>PLAY AGAIN</button>
               <button
