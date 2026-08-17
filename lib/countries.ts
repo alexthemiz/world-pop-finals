@@ -5,46 +5,46 @@ export interface CountryStats {
   pop: number;        // population
   area: number;       // km²
   founded: number;    // year established
-  gdp: number;        // USD (nominal)
-  lifeExp: number;    // life expectancy at birth (years)
-  medianAge: number;  // median age (years)
-  co2pc: number;      // CO2 emissions per capita (tonnes)
-  unesco: number;     // UNESCO World Heritage Sites
-  fifa: number;       // FIFA ranking (lower = better; use -fifa for getValue)
-  wcApps: number;     // FIFA World Cup appearances (all-time)
-  nobel: number;      // Nobel Prize winners (all-time, by country of birth/citizenship)
-  unemployment: number; // unemployment rate (%)
-  elevation: number;  // mean elevation (metres)
-  forest: number;     // forest coverage (%)
-  coastline: number;  // coastline length (km)
+  gdp: number | null;        // USD (nominal)
+  lifeExp: number | null;    // life expectancy at birth (years)
+  medianAge: number | null;  // median age (years)
+  co2pc: number | null;      // CO2 emissions per capita (tonnes)
+  unesco: number | null;     // UNESCO World Heritage Sites
+  fifa: number | null;       // FIFA ranking (lower = better; use -fifa for getValue)
+  wcApps: number | null;     // FIFA World Cup appearances (all-time)
+  nobel: number | null;      // Nobel Prize winners (all-time, by country of birth/citizenship)
+  unemployment: number | null; // unemployment rate (%)
+  elevation: number | null;  // mean elevation (metres)
+  forest: number | null;     // forest coverage (%)
+  coastline: number | null;  // coastline length (km)
   // Batch 1 — whimsy stats
-  fertilityRate: number;  // births per woman (UN/World Bank)
-  obesityRate: number;    // % adults obese, age-standardised (WHO/World Obesity Federation)
-  happinessScore: number; // World Happiness Report 2025 ladder score (0–10)
-  birdSpecies: number;    // recorded bird species (BirdLife International / BioDB)
-  firearmsRate: number;   // civilian firearms per 100 people (Small Arms Survey 2018)
-  teaPc: number;          // kg tea consumed per capita per year (FAO; includes mate for S. America)
-  publicHolidays: number; // national public holidays (count)
+  fertilityRate: number | null;  // births per woman (UN/World Bank)
+  obesityRate: number | null;    // % adults obese, age-standardised (WHO/World Obesity Federation)
+  happinessScore: number | null; // World Happiness Report 2025 ladder score (0–10)
+  birdSpecies: number | null;    // recorded bird species (BirdLife International / BioDB)
+  firearmsRate: number | null;   // civilian firearms per 100 people (Small Arms Survey 2018)
+  teaPc: number | null;          // kg tea consumed per capita per year (FAO; includes mate for S. America)
+  publicHolidays: number | null; // national public holidays (count)
   // Batch 2 — society & environment
-  internetSpeed: number;   // avg download speed Mbps (Ookla/worldpopulationreview.com 2025)
-  renewableEnergy: number; // % of electricity from renewables (IEA / Wikipedia)
-  prisonRate: number;      // prison population per 100,000 (World Prison Brief)
-  homicideRate: number;    // intentional homicide rate per 100,000 (UNODC / Wikipedia)
-  tourists: number;        // international tourist arrivals millions/year (UNWTO 2023)
-  languages: number;       // living languages spoken within borders (Ethnologue)
-  precipitation: number;   // average annual rainfall mm/year (World Bank / Wikipedia)
+  internetSpeed: number | null;   // avg download speed Mbps (Ookla/worldpopulationreview.com 2025)
+  renewableEnergy: number | null; // % of electricity from renewables (IEA / Wikipedia)
+  prisonRate: number | null;      // prison population per 100,000 (World Prison Brief)
+  homicideRate: number | null;    // intentional homicide rate per 100,000 (UNODC / Wikipedia)
+  tourists: number | null;        // international tourist arrivals millions/year (UNWTO 2023)
+  languages: number | null;       // living languages spoken within borders (Ethnologue)
+  precipitation: number | null;   // average annual rainfall mm/year (World Bank / Wikipedia)
   // Batch 3 — food & development
-  coffeePc: number;       // kg coffee consumed per capita/year (ICO / worldpopulationreview.com)
-  cheesePc: number;       // kg cheese consumed per capita/year (OECD / USDA FAS)
-  honeyProduction: number; // tonnes of honey produced/year (FAO/FAOSTAT)
-  hospitalBeds: number;   // hospital beds per 1,000 people (World Bank / WHO)
-  avgSchooling: number;   // mean years of schooling, adults 25+ (UNDP HDR 2024)
-  electricityPc: number;  // electricity consumption per capita kWh/year (World Bank / IEA)
+  coffeePc: number | null;       // kg coffee consumed per capita/year (ICO / worldpopulationreview.com)
+  cheesePc: number | null;       // kg cheese consumed per capita/year (OECD / USDA FAS)
+  honeyProduction: number | null; // tonnes of honey produced/year (FAO/FAOSTAT)
+  hospitalBeds: number | null;   // hospital beds per 1,000 people (World Bank / WHO)
+  avgSchooling: number | null;   // mean years of schooling, adults 25+ (UNDP HDR 2024)
+  electricityPc: number | null;  // electricity consumption per capita kWh/year (World Bank / IEA)
   // Batch 4 — nature & infrastructure
-  roadLength: number;      // total road network length, km (CIA World Factbook / Wikipedia)
-  threatenedSpecies: number; // total threatened species count (IUCN Red List country profiles)
-  protectedLand: number;   // % of land area under protection (World Bank ER.LND.PTLD.ZS)
-  disasterRisk: number;    // INFORM Risk Index, 0-10 scale, higher = higher risk (EU JRC)
+  roadLength: number | null;      // total road network length, km (CIA World Factbook / Wikipedia)
+  threatenedSpecies: number | null; // total threatened species count (IUCN Red List country profiles)
+  protectedLand: number | null;   // % of land area under protection (World Bank ER.LND.PTLD.ZS)
+  disasterRisk: number | null;    // INFORM Risk Index, 0-10 scale, higher = higher risk (EU JRC)
 }
 
 export const COUNTRIES: Record<string, CountryStats> = {
@@ -201,7 +201,7 @@ export interface QuestionType {
   id: string;
   key: string;
   question: string;
-  getValue: (country: string) => number;
+  getValue: (country: string) => number | null;
   explain: (winner: string, loser: string, wv: number, lv: number) => string;
 }
 
@@ -231,7 +231,7 @@ export const QUESTION_TYPES: QuestionType[] = [
     id: "gdp",
     key: "gdp",
     question: "WHICH HAS THE HIGHER GDP?",
-    getValue: (c) => COUNTRIES[c].gdp,
+    getValue: (c) => COUNTRIES[c].gdp ?? null,
     explain: (w, l, wv, lv) => {
       const fmt = (v: number) => v >= 1e12 ? `$${(v/1e12).toFixed(1)}T` : `$${(v/1e9).toFixed(0)}B`;
       return `${w}: ${fmt(wv)} vs ${l}: ${fmt(lv)}`;
@@ -241,7 +241,7 @@ export const QUESTION_TYPES: QuestionType[] = [
     id: "gdppc",
     key: "gdppc",
     question: "WHICH HAS HIGHER GDP PER CAPITA?",
-    getValue: (c) => COUNTRIES[c].gdp / COUNTRIES[c].pop,
+    getValue: (c) => { const gdp = COUNTRIES[c].gdp; return gdp === null ? null : gdp / COUNTRIES[c].pop; },
     explain: (w, l, wv, lv) => `${w}: $${Math.round(wv).toLocaleString()}/person vs ${l}: $${Math.round(lv).toLocaleString()}/person`,
   },
   {
@@ -283,7 +283,7 @@ export const QUESTION_TYPES: QuestionType[] = [
     id: "fifa",
     key: "fifa",
     question: "WHICH HAS THE BETTER FIFA RANKING?",
-    getValue: (c) => -COUNTRIES[c].fifa,
+    getValue: (c) => { const v = COUNTRIES[c].fifa; return v === null ? null : -v; },
     explain: (w, l, wv, lv) => `${w}: #${-wv} vs ${l}: #${-lv}`,
   },
   {
@@ -304,7 +304,7 @@ export const QUESTION_TYPES: QuestionType[] = [
     id: "unemployment",
     key: "unemployment",
     question: "WHICH HAS LOWER UNEMPLOYMENT?",
-    getValue: (c) => -COUNTRIES[c].unemployment,
+    getValue: (c) => { const v = COUNTRIES[c].unemployment; return v === null ? null : -v; },
     explain: (w, l, wv, lv) => `${w}: ${-wv}% vs ${l}: ${-lv}%`,
   },
   {

@@ -33,8 +33,8 @@ function shuffle<T>(arr: T[]): T[] {
 function makeStatQuestion(match: MatchPair, qTypeIndex: number): Question {
   const { home, away, group } = match;
   const qType = QUESTION_TYPES[qTypeIndex];
-  const homeValue = qType.getValue(home);
-  const awayValue = qType.getValue(away);
+  const homeValue = qType.getValue(home)!;
+  const awayValue = qType.getValue(away)!;
   const winner = homeValue >= awayValue ? home : away;
   const loser = winner === home ? away : home;
   const winnerValue = winner === home ? homeValue : awayValue;
@@ -77,7 +77,10 @@ function allQuestionsForMatch(match: MatchPair): Question[] {
   const { home, away } = match;
   const questions: Question[] = [];
   QUESTION_TYPES.forEach((qType, i) => {
-    if (qType.getValue(home) !== qType.getValue(away)) {
+    const homeValue = qType.getValue(home);
+    const awayValue = qType.getValue(away);
+    if (homeValue === null || awayValue === null) return;
+    if (homeValue !== awayValue) {
       questions.push(makeStatQuestion(match, i));
     }
   });
