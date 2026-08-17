@@ -264,23 +264,6 @@ function HomeContent() {
             ))}
           </div>
 
-          {/* Tournament cards row */}
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", maxWidth: 460 }}>
-            {TOURNAMENTS.map(t => (
-              <Link key={t.id} href={`/${t.id}`} style={{
-                display: "flex", flexDirection: "column", alignItems: "center",
-                padding: "10px 16px", background: "#0a0e14",
-                border: "2px solid var(--panel-border)", borderRadius: 6,
-                color: "var(--gold)", textDecoration: "none", fontSize: 8, gap: 4,
-                fontFamily: "var(--font-press-start), monospace",
-              }}>
-                <span style={{ fontSize: 20 }}>{t.emoji}</span>
-                <span>{t.shortName}</span>
-                <span style={{ color: "var(--text-dim)", fontSize: 7 }}>{t.hosts}</span>
-              </Link>
-            ))}
-          </div>
-
           {/* Searchable country pickers */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
             <div style={{ fontSize: 8, color: "var(--text)" }}>PICK ANY TWO NATIONS</div>
@@ -372,17 +355,39 @@ function HomeContent() {
 
           {/* Single player */}
           {mode === "single" && (
-            <button
-              onClick={() => {
-                const pair = countryA && countryB
-                  ? { home: countryA, away: countryB }
-                  : getRandomMatchup();
-                router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
-              }}
-              style={ctaButtonStyle}
-            >
-              PLAY
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  const pair = countryA && countryB
+                    ? { home: countryA, away: countryB }
+                    : getRandomMatchup();
+                  router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
+                }}
+                style={ctaButtonStyle}
+              >
+                PLAY
+              </button>
+
+              {/* Tournament cards */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
+                <div style={{ fontSize: 7, color: "var(--text-dim)" }}>OR PICK A MATCHUP FROM A RECENT WC:</div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                  {TOURNAMENTS.map(t => (
+                    <Link key={t.id} href={`/${t.id}`} style={{
+                      display: "flex", flexDirection: "column", alignItems: "center",
+                      padding: "10px 16px", background: "#0a0e14",
+                      border: "2px solid var(--panel-border)", borderRadius: 6,
+                      color: "var(--gold)", textDecoration: "none", fontSize: 8, gap: 4,
+                      fontFamily: "var(--font-press-start), monospace",
+                    }}>
+                      <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                      <span>{t.shortName}</span>
+                      <span style={{ color: "var(--text-dim)", fontSize: 7 }}>{t.hosts}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
 
           {/* Enter name + create game (Versus mode only) */}
