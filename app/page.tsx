@@ -2,18 +2,26 @@
 
 import { Suspense, useEffect, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { supabase, type GameRow } from "@/lib/supabase";
 import { generateQuestions } from "@/lib/questions";
 import { getOrCreateUUID } from "@/lib/uuid";
-import { getAllMatchPairs, getAllCountryPairs } from "@/lib/matches";
-import { getAllKnockoutPairs, KNOCKOUT_ROUNDS } from "@/lib/knockoutMatches";
 import { COUNTRIES } from "@/lib/countries";
+import { TOURNAMENTS } from "@/lib/tournaments";
 import { subscribeToGamePush, isPushSupported } from "@/lib/push";
 import Footer from "@/components/Footer";
 import { PitchBackground, FlagTicker } from "@/components/HomeDecorations";
 
 function makeGameId(): string {
   return Math.random().toString(36).slice(2, 9);
+}
+
+function getRandomMatchup() {
+  const nations = Object.keys(COUNTRIES);
+  let a = nations[Math.floor(Math.random() * nations.length)];
+  let b = nations[Math.floor(Math.random() * nations.length)];
+  while (b === a) b = nations[Math.floor(Math.random() * nations.length)];
+  return { home: a, away: b };
 }
 
 function HomeContent() {
@@ -28,90 +36,21 @@ function HomeContent() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [myGames, setMyGames] = useState<GameRow[]>([]);
-  // Not restored from localStorage on load: the underlying selection (which
-  // knockout match, which countries) isn't persisted, so restoring only the
-  // mode would show an "active" picker with nothing actually picked.
-  const [pickerMode, setPickerMode] = useState<"random" | "knockout" | "group" | "custom">("random");
-  const [pickedKnockout, setPickedKnockout] = useState("");
-  const [pickedGroupMatch, setPickedGroupMatch] = useState("");
-  const [customHome, setCustomHome] = useState("");
-  const [customAway, setCustomAway] = useState("");
+  const [countryA, setCountryA] = useState("");
+  const [countryB, setCountryB] = useState("");
+  const [searchA, setSearchA] = useState("");
+  const [searchB, setSearchB] = useState("");
+  const [openA, setOpenA] = useState(false);
+  const [openB, setOpenB] = useState(false);
   const [waitingGameId, setWaitingGameId] = useState<string | null>(null);
   const [gameUrl, setGameUrl] = useState("");
   const [gamesPlayed, setGamesPlayed] = useState<number | null>(null);
   const [notifyState, setNotifyState] = useState<"idle" | "on" | "blocked">("idle");
   const [outstandingGames, setOutstandingGames] = useState<GameRow[]>([]);
 
-  const allPairs = getAllMatchPairs();
-  const knockoutPairs = getAllKnockoutPairs();
-  const allCountryPairs = getAllCountryPairs();
-  const countryNames = Object.keys(COUNTRIES).sort();
-
-  const groupedMatches: Record<string, typeof allPairs> = {};
-  allPairs.forEach((p) => {
-    if (!groupedMatches[p.group]) groupedMatches[p.group] = [];
-    groupedMatches[p.group].push(p);
-  });
-  const groups = Object.keys(groupedMatches).sort();
-
-  const groupedKnockout: Record<string, typeof knockoutPairs> = {};
-  knockoutPairs.forEach((p) => {
-    if (!groupedKnockout[p.group]) groupedKnockout[p.group] = [];
-    groupedKnockout[p.group].push(p);
-  });
-
-  function getMatchPairs() {
-    if (pickerMode === "knockout" && pickedKnockout) {
-      const [home, away] = pickedKnockout.split("|");
-      const pair = knockoutPairs.find((p) => p.home === home && p.away === away);
-      if (pair) return [pair];
-    } else if (pickerMode === "group" && pickedGroupMatch) {
-      const [home, away] = pickedGroupMatch.split("|");
-      const pair = allPairs.find((p) => p.home === home && p.away === away);
-      if (pair) return [pair];
-    } else if (pickerMode === "custom" && customHome && customAway) {
-      return [{ home: customHome, away: customAway, group: "" }];
-    }
-    return allCountryPairs;
-  }
-
-  function selectRandom() {
-    setPickerMode("random");
-    setPickedKnockout("");
-    setPickedGroupMatch("");
-    setCustomHome("");
-    setCustomAway("");
-  }
-
-  function selectKnockout(value: string) {
-    setPickedKnockout(value);
-    setPickedGroupMatch("");
-    setCustomHome("");
-    setCustomAway("");
-    setPickerMode(value ? "knockout" : "random");
-  }
-
-  function selectGroupMatch(value: string) {
-    setPickedGroupMatch(value);
-    setPickedKnockout("");
-    setCustomHome("");
-    setCustomAway("");
-    setPickerMode(value ? "group" : "random");
-  }
-
-  function selectCustomHome(value: string) {
-    setCustomHome(value);
-    setPickedKnockout("");
-    setPickedGroupMatch("");
-    setPickerMode("custom");
-  }
-
-  function selectCustomAway(value: string) {
-    setCustomAway(value);
-    setPickedKnockout("");
-    setPickedGroupMatch("");
-    setPickerMode("custom");
-  }
+  const allNations = Object.keys(COUNTRIES).sort();
+  const filteredA = allNations.filter(n => n.toLowerCase().includes(searchA.toLowerCase()) && n !== countryB);
+  const filteredB = allNations.filter(n => n.toLowerCase().includes(searchB.toLowerCase()) && n !== countryA);
 
   useEffect(() => {
     if (searchParams.get("mode") === "challenge") setMode("vs-friend");
@@ -203,7 +142,10 @@ function HomeContent() {
     setError(null);
     try {
       const id = makeGameId();
-      const questions = generateQuestions(getMatchPairs(), undefined, 5);
+      const pair = countryA && countryB
+        ? { home: countryA, away: countryB, group: "Custom" }
+        : { ...getRandomMatchup(), group: "Custom" };
+      const questions = generateQuestions([pair], undefined, 5);
       const { error: insertError } = await supabase.from("games").insert({
         id,
         questions,
@@ -322,123 +264,120 @@ function HomeContent() {
             ))}
           </div>
 
-          {/* Finals quick-pick */}
-          <button
-            onClick={() => selectKnockout("Spain|Argentina")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "10px 18px",
-              background: pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "rgba(255,200,0,0.15)" : "#0a0e14",
-              border: `2px solid ${pickerMode === "knockout" && pickedKnockout === "Spain|Argentina" ? "var(--gold)" : "var(--panel-border)"}`,
-              borderRadius: 6,
-              cursor: "pointer",
-              color: "var(--text)",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://flagcdn.com/32x24/es.png" width={32} height={24} alt="Spain" style={{ imageRendering: "pixelated" }} />
-            <span style={{ fontSize: 8, color: "var(--gold)", whiteSpace: "nowrap" }}>⚽ THE FINAL ⚽</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://flagcdn.com/32x24/ar.png" width={32} height={24} alt="Argentina" style={{ imageRendering: "pixelated" }} />
-          </button>
+          {/* Tournament cards row */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", maxWidth: 460 }}>
+            {TOURNAMENTS.map(t => (
+              <Link key={t.id} href={`/${t.id}`} style={{
+                display: "flex", flexDirection: "column", alignItems: "center",
+                padding: "10px 16px", background: "#0a0e14",
+                border: "2px solid var(--panel-border)", borderRadius: 6,
+                color: "var(--gold)", textDecoration: "none", fontSize: 8, gap: 4,
+                fontFamily: "var(--font-press-start), monospace",
+              }}>
+                <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                <span>{t.shortName}</span>
+                <span style={{ color: "var(--text-dim)", fontSize: 7 }}>{t.hosts}</span>
+              </Link>
+            ))}
+          </div>
 
-          {/* Match picker */}
+          {/* Searchable country pickers */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%", maxWidth: 460 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 22, width: "100%" }}>
-              <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>SELECT A MATCH FROM THE 2026 TOURNAMENT</div>
-                <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
-                  <select
-                    value={pickedKnockout}
-                    onChange={(e) => selectKnockout(e.target.value)}
-                    style={{ ...pickerSelectStyle(pickerMode === "knockout"), width: "calc(50% - 4px)", minWidth: 140 }}
-                  >
-                    <option value="">— KNOCKOUT STAGE —</option>
-                    {KNOCKOUT_ROUNDS.map((round) => (
-                      <optgroup key={round} label={`── ${round.toUpperCase()} ──`}>
-                        {(groupedKnockout[round] ?? []).map((p) => (
-                          <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                            {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                          </option>
-                        ))}
-                      </optgroup>
+            <div style={{ fontSize: 8, color: "var(--text)" }}>PICK ANY TWO NATIONS</div>
+            <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap" }}>
+              {/* Country A picker */}
+              <div style={{ position: "relative", flex: 1, minWidth: 140 }}>
+                <input
+                  value={countryA || searchA}
+                  onFocus={() => { setOpenA(true); if (countryA) { setSearchA(""); setCountryA(""); } }}
+                  onChange={e => { setSearchA(e.target.value); setCountryA(""); }}
+                  onBlur={() => setTimeout(() => setOpenA(false), 150)}
+                  placeholder="COUNTRY 1"
+                  style={{
+                    fontFamily: "var(--font-press-start), monospace",
+                    fontSize: 8, padding: "9px 10px", width: "100%", boxSizing: "border-box",
+                    background: "#0a0e14", border: `2px solid ${countryA ? "var(--gold)" : "var(--panel-border)"}`,
+                    color: "var(--text)", borderRadius: 4, cursor: "pointer",
+                  }}
+                />
+                {openA && filteredA.length > 0 && (
+                  <div style={{
+                    position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+                    background: "#0a0e14", border: "2px solid var(--panel-border)",
+                    borderTop: "none", maxHeight: 200, overflowY: "auto",
+                  }}>
+                    {filteredA.map(n => (
+                      <div
+                        key={n}
+                        onMouseDown={() => { setCountryA(n); setSearchA(""); setOpenA(false); }}
+                        style={{
+                          padding: "8px 10px", cursor: "pointer", fontSize: 8,
+                          color: "var(--text)", fontFamily: "var(--font-press-start), monospace",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,200,0,0.1)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {n}
+                      </div>
                     ))}
-                  </select>
-                  <select
-                    value={pickedGroupMatch}
-                    onChange={(e) => selectGroupMatch(e.target.value)}
-                    style={{ ...pickerSelectStyle(pickerMode === "group"), width: "calc(50% - 4px)", minWidth: 140 }}
-                  >
-                    <option value="">— GROUP STAGE —</option>
-                    {groups.map((g) => (
-                      <optgroup key={g} label={`── GROUP ${g} ──`}>
-                        {groupedMatches[g].map((p) => (
-                          <option key={`${p.home}|${p.away}`} value={`${p.home}|${p.away}`}>
-                            {p.home.toUpperCase()} vs {p.away.toUpperCase()}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
+                  </div>
+                )}
               </div>
-
-              <div>
-                <div style={{ fontSize: 8, color: "var(--text)", marginBottom: 10 }}>OR PICK YOUR TWO 2026 PARTICIPANTS</div>
-                <div style={{ display: "flex", gap: 8, width: "100%", flexWrap: "wrap", maxWidth: 440 }}>
-                  <select
-                    value={customHome}
-                    onChange={(e) => selectCustomHome(e.target.value)}
-                    style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
-                  >
-                    <option value="">— COUNTRY 1 —</option>
-                    {countryNames.filter((c) => c !== customAway).map((c) => (
-                      <option key={c} value={c}>{c.toUpperCase()}</option>
+              {/* Country B picker */}
+              <div style={{ position: "relative", flex: 1, minWidth: 140 }}>
+                <input
+                  value={countryB || searchB}
+                  onFocus={() => { setOpenB(true); if (countryB) { setSearchB(""); setCountryB(""); } }}
+                  onChange={e => { setSearchB(e.target.value); setCountryB(""); }}
+                  onBlur={() => setTimeout(() => setOpenB(false), 150)}
+                  placeholder="COUNTRY 2"
+                  style={{
+                    fontFamily: "var(--font-press-start), monospace",
+                    fontSize: 8, padding: "9px 10px", width: "100%", boxSizing: "border-box",
+                    background: "#0a0e14", border: `2px solid ${countryB ? "var(--gold)" : "var(--panel-border)"}`,
+                    color: "var(--text)", borderRadius: 4, cursor: "pointer",
+                  }}
+                />
+                {openB && filteredB.length > 0 && (
+                  <div style={{
+                    position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+                    background: "#0a0e14", border: "2px solid var(--panel-border)",
+                    borderTop: "none", maxHeight: 200, overflowY: "auto",
+                  }}>
+                    {filteredB.map(n => (
+                      <div
+                        key={n}
+                        onMouseDown={() => { setCountryB(n); setSearchB(""); setOpenB(false); }}
+                        style={{
+                          padding: "8px 10px", cursor: "pointer", fontSize: 8,
+                          color: "var(--text)", fontFamily: "var(--font-press-start), monospace",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,200,0,0.1)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {n}
+                      </div>
                     ))}
-                  </select>
-                  <select
-                    value={customAway}
-                    onChange={(e) => selectCustomAway(e.target.value)}
-                    style={{ ...pickerSelectStyle(pickerMode === "custom"), width: "calc(50% - 4px)", minWidth: 140 }}
-                  >
-                    <option value="">— COUNTRY 2 —</option>
-                    {countryNames.filter((c) => c !== customHome).map((c) => (
-                      <option key={c} value={c}>{c.toUpperCase()}</option>
-                    ))}
-                  </select>
-                </div>
+                  </div>
+                )}
               </div>
-
-              {pickerMode !== "random" && (
-                <button
-                  onClick={selectRandom}
-                  style={{ fontSize: 8, background: "transparent", border: "none", color: "var(--text)", cursor: "pointer", padding: 0, textDecoration: "underline", fontFamily: "inherit" }}
-                >
-                  CLEAR — USE RANDOM MATCHUP
-                </button>
-              )}
-              {pickerMode === "random" && (
-                <div style={{ fontSize: 8, color: "var(--text)" }}>NO SELECTION = RANDOM MATCHUP</div>
-              )}
             </div>
+            <button
+              onClick={() => { const m = getRandomMatchup(); setCountryA(m.home); setCountryB(m.away); setSearchA(""); setSearchB(""); }}
+              style={{ fontSize: 8, background: "transparent", border: "2px solid var(--panel-border)", color: "var(--text)", cursor: "pointer", padding: "8px 14px", borderRadius: 4, fontFamily: "var(--font-press-start), monospace" }}
+            >
+              🎲 RANDOM MATCHUP
+            </button>
           </div>
 
           {/* Single player */}
           {mode === "single" && (
             <button
               onClick={() => {
-                // getMatchPairs() falls back to the full random pool when the
-                // current picker mode doesn't have a complete selection yet —
-                // only route with home/away when it resolved to one specific pair.
-                const pairs = getMatchPairs();
-                if (pickerMode !== "random" && pairs.length === 1) {
-                  const pair = pairs[0];
-                  router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
-                  return;
-                }
-                router.push("/single");
+                const pair = countryA && countryB
+                  ? { home: countryA, away: countryB }
+                  : getRandomMatchup();
+                router.push(`/single?home=${encodeURIComponent(pair.home)}&away=${encodeURIComponent(pair.away)}`);
               }}
               style={ctaButtonStyle}
             >
@@ -642,20 +581,6 @@ export default function Home() {
       <HomeContent />
     </Suspense>
   );
-}
-
-function pickerSelectStyle(active: boolean): CSSProperties {
-  return {
-    fontFamily: "var(--font-press-start), monospace",
-    fontSize: 8,
-    padding: "9px 10px",
-    background: "#0a0e14",
-    border: `2px solid ${active ? "var(--gold)" : "var(--panel-border)"}`,
-    color: "var(--text)",
-    borderRadius: 4,
-    width: "100%",
-    cursor: "pointer",
-  };
 }
 
 const ctaButtonStyle: CSSProperties = {
