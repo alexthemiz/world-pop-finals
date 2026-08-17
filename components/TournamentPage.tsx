@@ -66,7 +66,7 @@ export default function TournamentPage({ config }: TournamentPageProps) {
 
   const allPairs = config.groups.map((m) => ({ home: m.home, away: m.away, group: m.group }));
   const knockoutPairs = config.knockout.map((m) => ({ home: m.home, away: m.away, group: m.group }));
-  const countryNames = config.nations.sort();
+  const countryNames = [...config.nations].sort();
 
   const groupedMatches: Record<string, typeof allPairs> = {};
   allPairs.forEach((p) => {
