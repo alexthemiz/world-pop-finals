@@ -87,7 +87,7 @@ function allQuestionsForMatch(match: MatchPair): Question[] {
 }
 
 /**
- * Picks one random match and returns exactly 5 questions from it (shuffled
+ * Picks one random match and returns up to `count` questions from it (shuffled
  * stat types). Used for the main round of a multiplayer game or single player.
  */
 export function generateQuestions(

@@ -9,14 +9,14 @@ export const KNOCKOUT_ROUNDS = ["Final", "Third Place", "Semifinals", "Quarterfi
 
 export const KNOCKOUT_MATCHES: Match[] = [
   // FINAL
-  { group: "Final", home: "Spain", away: "Argentina", date: "Sun Jul 19", time: "3:00 PM ET", venue: "MetLife Stadium, New York", result: null },
+  { group: "Final", home: "Spain", away: "Argentina", date: "Sun Jul 19", time: "3:00 PM ET", venue: "MetLife Stadium, New York", result: "1-0 AET" },
 
   // THIRD PLACE
-  { group: "Third Place", home: "France", away: "England", date: "Sat Jul 18", time: "3:00 PM ET", venue: "AT&T Stadium, Dallas", result: null },
+  { group: "Third Place", home: "France", away: "England", date: "Sat Jul 18", time: "3:00 PM ET", venue: "Hard Rock Stadium, Miami", result: "4-6" },
 
   // SEMIFINALS
-  { group: "Semifinals", home: "France", away: "Spain", date: "Tue Jul 14", time: "3:00 PM ET", venue: "AT&T Stadium, Dallas", result: null },
-  { group: "Semifinals", home: "England", away: "Argentina", date: "Wed Jul 15", time: "3:00 PM ET", venue: "Mercedes-Benz Stadium, Atlanta", result: null },
+  { group: "Semifinals", home: "France", away: "Spain", date: "Tue Jul 14", time: "3:00 PM ET", venue: "AT&T Stadium, Dallas", result: "0-2" },
+  { group: "Semifinals", home: "England", away: "Argentina", date: "Wed Jul 15", time: "3:00 PM ET", venue: "Mercedes-Benz Stadium, Atlanta", result: "1-2 AET" },
 
   // QUARTERFINALS
   { group: "Quarterfinals", home: "France", away: "Morocco", date: "Thu Jul 9", time: "4:00 PM ET", venue: "Gillette Stadium, Boston", result: "2-0" },
@@ -51,16 +51,6 @@ export const KNOCKOUT_MATCHES: Match[] = [
   { group: "Round of 32", home: "Egypt", away: "Australia", date: "Fri Jul 3", time: "12:00 PM ET", venue: "AT&T Stadium, Dallas", result: "1-1", penaltyWinner: "Egypt", penaltyScore: "4-2" },
   { group: "Round of 32", home: "Argentina", away: "Cabo Verde", date: "Fri Jul 3", time: "3:00 PM ET", venue: "Hard Rock Stadium, Miami", result: "3-2" },
   { group: "Round of 32", home: "Colombia", away: "Ghana", date: "Fri Jul 3", time: "6:00 PM ET", venue: "Arrowhead Stadium, Kansas City", result: "1-0" },
-
-  // ROUND OF 16
-  { group: "Round of 16", home: "Morocco", away: "Canada", date: "Sat Jul 4", time: "1:00 PM ET", venue: "NRG Stadium, Houston", result: "3-0" },
-  { group: "Round of 16", home: "France", away: "Paraguay", date: "Sat Jul 4", time: "4:30 PM ET", venue: "Lincoln Financial Field, Philadelphia", result: "1-0" },
-  { group: "Round of 16", home: "Norway", away: "Brazil", date: "Sun Jul 5", time: "4:00 PM ET", venue: "MetLife Stadium, New York", result: "2-0" },
-  { group: "Round of 16", home: "England", away: "Mexico", date: "Sun Jul 5", time: "8:00 PM ET", venue: "Estadio Azteca, Mexico City", result: "3-2" },
-  { group: "Round of 16", home: "Spain", away: "Portugal", date: "Mon Jul 6", time: "3:00 PM ET", venue: "AT&T Stadium, Dallas", result: "1-0" },
-  { group: "Round of 16", home: "Belgium", away: "USA", date: "Mon Jul 6", time: "8:00 PM ET", venue: "Lumen Field, Seattle", result: "4-1" },
-  { group: "Round of 16", home: "Argentina", away: "Egypt", date: "Tue Jul 7", time: "4:00 PM ET", venue: "Mercedes-Benz Stadium, Atlanta", result: "3-2" },
-  { group: "Round of 16", home: "Switzerland", away: "Colombia", date: "Tue Jul 7", time: "8:00 PM ET", venue: "BC Place, Vancouver", result: "0-0", penaltyWinner: "Switzerland", penaltyScore: "4-3" },
 
 ];
 

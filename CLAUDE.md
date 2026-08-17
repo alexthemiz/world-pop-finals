@@ -98,10 +98,8 @@ waiting → active → sudden_death → finished
   (any 2 of 48 nations) / Knockout Round dropdown / Group Stage dropdown /
   Pick-two-countries (two dropdowns, duplicate country blocked). Only one is
   "armed" at a time — picking one clears the other three's selections.
-  lib/knockoutMatches.ts has Round of 32, Round of 16, and Quarterfinals
-  (all fully resolved) plus Semifinals (matchups set, not yet played —
-  result: null); Third Place and Final aren't added yet since the
-  semifinal winners aren't known — add them once settled.
+  lib/knockoutMatches.ts has all rounds fully resolved through the Final
+  (Spain 1-0 Argentina AET). Third Place was England 6-4 France.
 - Multiplayer player identity (player1 vs player2) is tracked client-side via
   localStorage key `trivia-kicks:<gameId>`, set on create/join.
 - PROJECT_BRAINDUMP.md is a standalone project summary meant to be pasted
